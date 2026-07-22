@@ -42,6 +42,7 @@ The world is not a horror setting. Nothing in it is supernatural, and nothing is
 21. Tone
 22. Inspirations
 23. Unique Mechanics
+24. Open Questions & Future Development
 
 ---
 
@@ -942,6 +943,41 @@ Documentary, procedural, and grounded — closer to an internal audit report or 
 - **Mega-AI Fragment Record Collection** — an optional, deeply buried investigation thread across all seven worlds; full completion is the only path to the Robot Uprising ending.
 - **Travel Permit & Class-Tier System** — every transportation mode checks a permit and class tier before departure, tying travel directly into the economy and progression systems rather than functioning as a free fast-travel menu.
 - **Optional Cyborg Conversion Mechanic** — a genuine, irreversible late-game choice trading survival-meter relief and material security for permanent autonomy loss.
+
+---
+
+## 24. OPEN QUESTIONS & FUTURE DEVELOPMENT
+
+This document defines world, tone, factions, and systems in detail. It does not yet define moment-to-moment player verbs, production scope, or a build plan. Honest backlog follows, organized by category rather than priority.
+
+### 24.1 Design Gaps to Resolve Next
+- **The core "Work/Task" gameplay is undefined.** Every system in this document (mortgage spiral, faction reputation, endings) sits around a job the player performs every day, and that job's actual moment-to-moment mechanic — what a bank-clerk shift feels like to play — has never been specified. Candidates: a document-comparison/stamping mechanic (Papers, Please-style), a dialogue-driven audit system, a simple data-matching puzzle. This is the single highest-priority open question.
+- **No conflict-resolution mechanic for CEC checkpoints or resistance beats.** Dialogue check, stealth, timing-based, or deliberately no failure-combat at all — undecided.
+- **No threshold math behind the eight endings.** "Emergent from accumulated meters" is a design intention, not a system; needs an actual table of which tracks and thresholds gate each ending before anyone could build toward it.
+- **No stated target session length.** A 6-hour narrative game and a 40-hour daily-life sim need very different depth in every system above — this decision changes almost everything else.
+- **No fail state short of the scripted tragic ending.** What a "bad day" looks like mechanically (not just narratively) is unspecified.
+
+### 24.2 Content to Expand
+- Full individual write-ups for the CEC "First Line" elite units, currently referenced only as a category.
+- A concrete scripted opening sequence (tutorializing filter, mortgage, commute, and checkpoint systems together).
+- At least one fully scripted mission path per ending, to pressure-test whether the meter design actually produces its intended ending rather than just gesturing at one.
+- A local slang/culture pass for AMP, "Second Skin," and the Combine, to match the depth already given to the eight worlds in Section 13.2.
+- A one-page pitch derived from this document for external use, distinct from the full GDD.
+
+### 24.3 Systems Not Yet Specified
+- Save/load and session structure.
+- Difficulty and accessibility options.
+- UI/UX flow — how meters, permits, and the two-tier document system are actually presented on screen.
+- Audio direction: music, ambient sound, voiced vs. text-only dialogue.
+- Target platform and engine, which materially affects whether the sky-traffic simulation (Section 6) is feasible as described.
+
+### 24.4 Realism / Consistency Watchlist
+- The Dyson swarm's build timeline (construction starting 2112, licensed "surplus" capacity by 2260) is fast relative to any real engineering estimate for solar-scale infrastructure. Either add an explicit self-replicating-manufacturing justification, or stretch the timeline.
+- The matter-disruption blade openly breaks conservation of mass-energy. This is handled narratively — flagged in-world as an unresolved engineering problem rather than hidden — but it remains the one piece of hardware closer to soft science-fantasy than the rest of the setting's otherwise fairly hard economics and politics. Worth a conscious decision on whether to keep the "erases matter" framing or dial it back to something smaller and more defensible, like "disperses matter into an unrecoverable state."
+- Population figures and interplanetary travel times hold up reasonably well against extrapolated real-world trends; no changes flagged.
+
+### 24.5 Sensitivity Note
+The robot-caste and cyborg-conversion systems are a deliberate allegory for real-world class and labor stratification — the strongest thematic material in the document, and also the material most likely to misfire if mission and event writing plays it too cute or too heavy-handed. Recommend a dedicated writers'-room pass focused specifically on this material before content production, separate from the systems-design pass.
 
 ---
 
