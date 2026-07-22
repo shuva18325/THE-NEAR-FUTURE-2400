@@ -5,7 +5,7 @@
 
 **Genre:** Docu-realist survival / daily-life simulation / narrative decision-making. No combat power fantasy, no horror-genre trappings.
 **Setting:** Solar System, Year 2400
-**Player Role:** A loan-servicing clerk who also owns (on a 47-year mortgage) one of the pods she processes paperwork for. Not a chosen one. Not a soldier. Not special.
+**Player Role:** A loan-servicing clerk who also owns (on a 47-year mortgage) one of the pods he processes paperwork for. Not a chosen one. Not a soldier. Not special.
 
 ---
 
@@ -49,16 +49,16 @@ The world is not a horror setting. Nothing in it is supernatural, and nothing is
 
 **THE NEAR FUTURE: 2400** is a docu-realist survival and daily-life game about being a small, replaceable part of a civilization that colonized the entire Solar System and fixed none of its underlying problems. Humanity built Mars domes, Venus mines, Jovian refineries, Saturnian farm towns, and wrapped the Sun itself in a power-generating swarm — and the wealth distribution looks almost exactly like it did in 2025, just with better plumbing for the people at the top.
 
-The player is not a hero. She is a **loan-servicing clerk** — a mortgage administrator working out of a bank branch inside her own megastructure, processing the same kind of 40-to-60-year pod loans she herself is paying down. Her job gives her legitimate, narrow access to financial records that quietly reveal how the larger system actually works: who's behind on payments, whose Stack is quietly being marked for redevelopment, which corporations are buying up defaulted debt. None of this makes her special. Thousands of clerks in thousands of branches do the same job across the system. She is one of them.
+The player is not a hero. He is a **loan-servicing clerk** — a mortgage administrator working out of a bank branch inside his own megastructure, processing the same kind of 40-to-60-year pod loans he himself is paying down. His job gives him legitimate, narrow access to financial records that quietly reveal how the larger system actually works: who's behind on payments, whose Stack is quietly being marked for redevelopment, which corporations are buying up defaulted debt. None of this makes him special. Thousands of clerks in thousands of branches do the same job across the system. He is one of them.
 
 ### Design Pillars
 
 - **Documentary realism.** The camera (literal and narrative) stays close to procedure: paperwork, checkpoints, maintenance schedules, shift changes. Drama emerges from what these procedures reveal, not from staged spectacle.
 - **The horror is retrospective, not diegetic.** Nobody in this world experiences their life as a horror story. It is simply how things are. Any unease the player feels is the player's own reaction, viewed from outside the fiction — the game never winks at it.
-- **You are replaceable.** If the player vanished tomorrow, HAB-CORE would reassign her pod within 48 hours and her branch would post the clerk position by the end of the week.
+- **You are replaceable.** If the player vanished tomorrow, HAB-CORE would reassign his pod within 48 hours and his branch would post the clerk position by the end of the week.
 - **Every convenience carries a debt instrument.** Energy is "infinite" and still metered. Housing is "owned" and still effectively rented across two lifetimes. Nothing is free; everything is financed.
 - **Propaganda is real, and clearly marked as such.** A handful of specific military and cyborg figures are genuinely extraordinary by any measurable standard — and the government's marketing department is not wrong to sell them as heroes. The game simply also shows you the internal maintenance log sitting right behind the recruitment poster.
-- **Multiple truths, multiple exits.** The game tracks what the player tolerated, who she helped, and what she learned — and ends her story accordingly, without moralizing about which ending is "correct."
+- **Multiple truths, multiple exits.** The game tracks what the player tolerated, who he helped, and what he learned — and ends his story accordingly, without moralizing about which ending is "correct."
 
 ---
 
@@ -560,7 +560,7 @@ The player owns — on paper — a **capsule pod apartment**, purchased through 
 
 | Role/Class | Typical Income | Mortgage/Housing Cost | Filter Cost | Notes |
 |---|---|---|---|---|
-| Meridian Branch loan clerk (player's role) | ₡H 1,350 | ₡H 610 | ₡H 120 | Steady, unglamorous, subject to the same arrears system she administers |
+| Meridian Branch loan clerk (player's role) | ₡H 1,350 | ₡H 610 | ₡H 120 | Steady, unglamorous, subject to the same arrears system he administers |
 | Earth gig worker (Stack owner) | ₡H 900–1,400 | ₡H 650 | ₡H 120 | Common alternate starting point |
 | Venus indentured miner | ₡H 400 (pre-debt deduction) | Company-deducted | Company-deducted | Effective take-home often near zero |
 | Jupiter moon refinery worker | ₡H 700 | ₡H 500 | ₡H 150 | Higher hazard-pay differential |
@@ -615,7 +615,7 @@ The Cyborg Enforcement Corps recruits from a narrow, difficult pool: debt convic
 - **Cost:** Documented average post-conversion service life of 15–20 years, attributed to progressive graft-rejection (**Skin Rejection Cascade**) — a known, internally documented condition the Corps does not feature in recruitment material.
 - **Status:** Feared and socially distanced by the districts they police, while materially better provided for — guaranteed housing, food, and medical care most residents cannot access.
 - **Internal fault line:** A minority extremist current — the "Second Skin" cells (Section 4.2) — holds that cyborg augmentation should be a command baseline rather than a service role, a position the official Corps leadership actively, quietly suppresses.
-- **Player interaction options:** Bribe a checkpoint, comply, resist (with real detainment risk), build leverage on an individual officer, or — as a genuine, irreversible late-game path — pursue conversion herself as an exit from mortgage debt and mortality-adjacent poverty, one of the game's eight endings.
+- **Player interaction options:** Bribe a checkpoint, comply, resist (with real detainment risk), build leverage on an individual officer, or — as a genuine, irreversible late-game path — pursue conversion himself as an exit from mortgage debt and mortality-adjacent poverty, one of the game's eight endings.
 
 ---
 
@@ -719,7 +719,7 @@ A small number of military and enforcement figures are genuinely extraordinary b
 Corps tactical units carrying partial second-generation grafts, informally "the Corps' First Line," and senior Directorate chassis pilots generally, receive the same two-tier treatment: internal readiness reports describe them in flat maintenance-and-incident-log language; public material — recruitment reels, museum displays, news features during unrest — consistently frames them as legendary, overpowered, near-mythic protectors. Both descriptions are, in their own register, accurate: the hardware really is extraordinary; the heroic framing really is manufactured.
 
 ### 14.2 The Player Character
-**The player** is a loan-servicing clerk at the Meridian Branch of the Helios Reserve Consortium, and a pod-owner in the same Stack she processes paperwork for — Pod 04, Hallway C, Meridian Stack-7. Her job gives her legitimate, narrow visibility into the financial system: whose mortgage is in arrears, which Stacks are quietly flagged for redevelopment, which corporate accounts are buying up defaulted debt in bulk. She is not the only clerk doing this job, and nothing about her position marks her as important. Everything that happens to her over the course of the game happens because of what she notices, who she talks to, and what she chooses to do with an ordinary job's ordinary access.
+**The player** is a loan-servicing clerk at the Meridian Branch of the Helios Reserve Consortium, and a pod-owner in the same Stack he processes paperwork for — Pod 04, Hallway C, Meridian Stack-7. His job gives him legitimate, narrow visibility into the financial system: whose mortgage is in arrears, which Stacks are quietly flagged for redevelopment, which corporate accounts are buying up defaulted debt in bulk. He is not the only clerk doing this job, and nothing about his position marks him as important. Everything that happens to him over the course of the game happens because of what he notices, who he talks to, and what he chooses to do with an ordinary job's ordinary access.
 
 ### 14.3 Supporting Cast
 
@@ -853,7 +853,7 @@ No traditional XP/level system. Progression tracks across parallel meters and un
 
 ### 17.2 Narrative Arcs (Act Structure)
 
-**Act I — The Branch and the Stack (Earth).** Introduces the player's job, her pod, her hallway, and the checkpoint system. She meets Kito Alvarez, processes her first ethically ambiguous foreclosure, survives her first CEC checkpoint sweep, and hears her first passing rumor about a Mega-AI fragment somewhere in her own supply chain of paperwork.
+**Act I — The Branch and the Stack (Earth).** Introduces the player's job, his pod, his hallway, and the checkpoint system. He meets Kito Alvarez, processes his first ethically ambiguous foreclosure, survives his first CEC checkpoint sweep, and hears his first passing rumor about a Mega-AI fragment somewhere in his own supply chain of paperwork.
 
 **Act II — The Long Ascent (off-world).** Travel permits — earned, purchased, or forced by circumstance (transfer, family emergency, an HRC audit assignment) — open Venus, Mars, the Jovian moons, and Saturn's moons. Faction reputations diverge meaningfully. The player meets Titan-01, Commander Vorren, a Mars Sovereign AI, Mother Cruz, and Speaker Kagawa. More of the Mega-AI's twenty components come into view — some through legitimate channels, some not.
 
@@ -882,12 +882,12 @@ No traditional XP/level system. Progression tracks across parallel meters and un
 
 ## 19. ENDINGS
 
-1. **Mars Escape** — Through earnings, reputation, or a House's favor, the player secures Martian residency. Bittersweet: she made it out, and is now materially part of the system that kept everyone else in.
+1. **Mars Escape** — Through earnings, reputation, or a House's favor, the player secures Martian residency. Bittersweet: he made it out, and is now materially part of the system that kept everyone else in.
 2. **Saturn Rural Life** — A quiet relocation to the Saturn Moon Cooperative. Low ambition, modest means, genuine peace — the closest thing the game has to an unambiguously gentle ending.
 3. **Earth Revolution** — The player commits fully to cross-district organizing on Earth, helping meaningfully disrupt CGN-MEC control over the Sprawl. Ends on uncertainty rather than triumph.
 4. **Robot Uprising** — Enough Mega-AI fragment documentation has been recovered that the Robot Council, Government Core systems, and dormant Directorate reserve components begin an unauthorized reintegration process. Deliberately ambiguous: a correction to a century-old mistake, or a new, better-organized version of the same problem.
-5. **Corporate Domination** — A player who consistently served MEC and Helios Compact interests ends up personally comfortable, inside a system that has become measurably more stratified because of the choices she made along the way.
-6. **Tragic Hydrogen Spill Death** — A failure-state ending triggered by ignoring hazard warnings, filter maintenance, or Act III's converging crises. The world continues, unremarkably, without her.
+5. **Corporate Domination** — A player who consistently served MEC and Helios Compact interests ends up personally comfortable, inside a system that has become measurably more stratified because of the choices he made along the way.
+6. **Tragic Hydrogen Spill Death** — A failure-state ending triggered by ignoring hazard warnings, filter maintenance, or Act III's converging crises. The world continues, unremarkably, without him.
 7. **Political Leader Ending** — Sustained political mission work and CGN reputation culminate in the player reaching a Secretary-General or planetary council seat, with reform and status-quo sub-branches depending on accumulated alignment.
 8. **Cyborg Assimilation Ending** — The player undergoes conversion into the Cyborg Enforcement Corps, trading personal autonomy for material security and physical capability, potentially serving alongside — or eventually succeeding — Commander Vorren.
 
@@ -937,7 +937,7 @@ Documentary, procedural, and grounded — closer to an internal audit report or 
 - **Sky Traffic Congestion Simulation** — a living three-dimensional traffic system affecting mission timing and checkpoint exposure, not a loading-screen abstraction.
 - **CEC Checkpoint Compliance/Suspicion Meter** — a real-time behavioral system during enforcement encounters, where hesitation, prior reputation, and documentation all matter.
 - **Mortgage & Arrears Spiral System** — missed payments compound with realistic, punishing interest, modeling how multi-generational debt actually functions on Earth, Venus, and Jupiter's moons.
-- **Distorted News Broadcast System** — the evening broadcast reflects the player's own day back at her, filtered and reframed, turning institutional messaging into a direct feedback mechanic rather than background flavor.
+- **Distorted News Broadcast System** — the evening broadcast reflects the player's own day back at him, filtered and reframed, turning institutional messaging into a direct feedback mechanic rather than background flavor.
 - **Faction Reputation Web** — reputation gains with one faction generate proportional, sometimes invisible, losses with a rival, forcing genuine tradeoffs rather than simple point accumulation.
 - **Mega-AI Fragment Record Collection** — an optional, deeply buried investigation thread across all seven worlds; full completion is the only path to the Robot Uprising ending.
 - **Travel Permit & Class-Tier System** — every transportation mode checks a permit and class tier before departure, tying travel directly into the economy and progression systems rather than functioning as a free fast-travel menu.
