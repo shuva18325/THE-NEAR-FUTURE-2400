@@ -951,11 +951,11 @@ Documentary, procedural, and grounded — closer to an internal audit report or 
 This document defines world, tone, factions, and systems in detail. It does not yet define moment-to-moment player verbs, production scope, or a build plan. Honest backlog follows, organized by category rather than priority.
 
 ### 24.1 Design Gaps to Resolve Next
-- **The core "Work/Task" gameplay is undefined.** Every system in this document (mortgage spiral, faction reputation, endings) sits around a job the player performs every day, and that job's actual moment-to-moment mechanic — what a bank-clerk shift feels like to play — has never been specified. Candidates: a document-comparison/stamping mechanic (Papers, Please-style), a dialogue-driven audit system, a simple data-matching puzzle. This is the single highest-priority open question.
-- **No conflict-resolution mechanic for CEC checkpoints or resistance beats.** Dialogue check, stealth, timing-based, or deliberately no failure-combat at all — undecided.
-- **No threshold math behind the eight endings.** "Emergent from accumulated meters" is a design intention, not a system; needs an actual table of which tracks and thresholds gate each ending before anyone could build toward it.
-- **No stated target session length.** A 6-hour narrative game and a 40-hour daily-life sim need very different depth in every system above — this decision changes almost everything else.
-- **No fail state short of the scripted tragic ending.** What a "bad day" looks like mechanically (not just narratively) is unspecified.
+- ~~**The core "Work/Task" gameplay is undefined.**~~ **RESOLVED** — see `MECHANICS_DOCUMENT.md`: the core verb is ADJUDICATE (rule-based case approval/denial through a document-verification interface), with full shift structure, sub-verbs, and audit-lag scoring.
+- **No conflict-resolution mechanic for CEC checkpoints or resistance beats.** Checkpoints are now mechanically defined as commute events (`MECHANICS_DOCUMENT.md` §4.5), but resistance/standoff beats outside the commute remain undecided.
+- **No threshold math behind the eight endings.** "Emergent from accumulated meters" is a design intention, not a system; needs an actual table of which tracks and thresholds gate each ending before anyone could build toward it. (The meters themselves are now specified in `MECHANICS_DOCUMENT.md`; the ending mapping is not.)
+- ~~**No stated target session length.**~~ **RESOLVED** — `MECHANICS_DOCUMENT.md` §7: 18–25 min per in-game day, 45-day campaign, 15–20 hours first run.
+- ~~**No fail state short of the scripted tragic ending.**~~ **RESOLVED** — `MECHANICS_DOCUMENT.md` §5: compounding failure ladders (Error Ledger, standing, mortgage stages, job loss to gig-work mode) with no instant game-over.
 
 ### 24.2 Content to Expand
 - Full individual write-ups for the CEC "First Line" elite units, currently referenced only as a category.
