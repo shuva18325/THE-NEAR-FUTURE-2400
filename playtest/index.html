@@ -239,8 +239,55 @@
   .fam-dialog{font-family:var(--sans); font-size:13px; line-height:1.6; color:var(--ink); border-left:2px solid var(--green-dim); padding:6px 0 6px 12px; margin-top:8px}
   .cost{font-size:10px; color:var(--ink-ghost); letter-spacing:.06em}
 
+  /* ---------- broadcast art & animation ---------- */
+  .bc-main{display:flex; gap:16px; padding:16px 18px; min-height:150px}
+  .bc-art{margin:0; font-family:var(--mono); font-size:9.5px; line-height:1.25; color:var(--amber);
+    background:#0b0805; border:1px solid var(--amber-ghost); padding:9px 10px; min-width:176px; max-width:210px;
+    overflow:hidden; position:relative; flex:none; align-self:flex-start}
+  .bc-art::after{content:""; position:absolute; left:0; right:0; height:26px; top:-30px;
+    background:linear-gradient(180deg,transparent,rgba(255,190,92,.16),transparent)}
+  @media (prefers-reduced-motion:no-preference){ .bc-art::after{animation:artscan 3.2s linear infinite} @keyframes artscan{to{top:110%}} }
+  .bc-txt{flex:1; min-width:0; font-family:var(--sans); line-height:1.55}
+  .bc-head{font-weight:700; font-size:17.5px; color:var(--ink); letter-spacing:.01em; min-height:24px; text-wrap:balance}
+  .bc-head .caret{display:inline-block; width:9px; background:var(--amber); height:1em; vertical-align:-2px; margin-left:2px}
+  @media (prefers-reduced-motion:no-preference){ .bc-head .caret{animation:blink 1s steps(2) infinite} }
+  .bc-body{margin-top:8px; color:var(--ink); font-size:13.5px; animation:bodyin .4s ease}
+  @keyframes bodyin{from{opacity:0; transform:translateY(4px)}}
+  .bc-vox{margin-top:12px; font-weight:800; font-size:16.5px; color:var(--amber-bright);
+    border-left:3px solid var(--red); padding:2px 0 2px 12px; line-height:1.35}
+  .bc-vox small{display:block; font-family:var(--mono); font-weight:400; font-size:10px; color:var(--ink-dim); letter-spacing:.12em; margin-top:5px}
+  .breaking .bc-bar{background:#2a0d0c; border-color:var(--red-dim)}
+  .breaking .bc-art{color:#ff8b86; border-color:var(--red-dim)}
+
+  /* ---------- hallway walk ---------- */
+  #hall-bubbles{position:absolute; inset:0; z-index:2; pointer-events:none; overflow:hidden}
+  .hall-ui{position:absolute; left:0; right:0; bottom:0; z-index:3; display:flex; align-items:center; gap:12px;
+    padding:12px 16px; background:linear-gradient(180deg,transparent,rgba(5,6,8,.92) 45%)}
+  .hall-hint{font-size:10.5px; color:var(--ink-dim); letter-spacing:.08em; margin-top:2px}
+  .bubble{position:absolute; z-index:2; max-width:240px; font-family:var(--sans); font-size:12px; line-height:1.45;
+    background:#efe9d6; color:#27221a; border-radius:6px; padding:8px 11px; box-shadow:0 4px 14px rgba(0,0,0,.55);
+    animation:bubin .25s ease; transform:translateX(-50%)}
+  .bubble::after{content:""; position:absolute; left:50%; bottom:-7px; margin-left:-6px; border:7px solid transparent; border-top-color:#efe9d6; border-bottom:0}
+  .bubble b{display:block; font-family:var(--mono); font-size:8.5px; letter-spacing:.14em; color:#7a6c48; margin-bottom:3px}
+  .bubble.muffled{background:#2a2e37; color:var(--ink-dim); font-style:italic}
+  .bubble.muffled::after{border-top-color:#2a2e37}
+  .bubble.muffled b{color:var(--ink-ghost)}
+  @keyframes bubin{from{opacity:0; transform:translateX(-50%) translateY(6px)}}
+
+  /* ---------- pod interior ---------- */
+  .pod-int{position:relative; border:1px solid var(--line); border-radius:var(--r); overflow:hidden; height:238px; background:#0b0908}
+  .pod-int canvas{position:absolute; inset:0; width:100%; height:100%; display:block}
+  .fix4{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:12px}
+
+  /* ---------- ethernet mastheads ---------- */
+  .mast{margin:0 0 12px; font-family:var(--mono); font-size:9.5px; line-height:1.25; color:var(--amber-dim);
+    border-bottom:1px solid var(--line); padding-bottom:8px; overflow-x:auto; white-space:pre}
+
   @media (max-width:820px){
-    .room{grid-template-columns:1fr} .ether{grid-template-columns:1fr} .ether-nav{max-height:120px}
+    .fix4{grid-template-columns:1fr 1fr}
+    .bc-main{flex-direction:column} .bc-art{max-width:none}
+    .ether{grid-template-columns:1fr} .ether-nav{max-height:120px}
+    .pod-int{height:190px}
   }
 
   @media (max-width:820px){
@@ -311,6 +358,20 @@
       </div>
     </section>
 
+    <!-- HALLWAY WALK -->
+    <section class="screen" id="scr-hallway">
+      <canvas id="hall-canvas" class="ride-canvas"></canvas>
+      <div id="hall-bubbles"></div>
+      <div class="hall-ui">
+        <div>
+          <div class="eyebrow">MERIDIAN STACK-7 · FLOOR 187 · HALLWAY C</div>
+          <div class="hall-hint" id="hall-hint">walking home…</div>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn-primary" id="hall-enter">ENTER POD 04 ▶</button>
+      </div>
+    </section>
+
     <!-- DESK -->
     <section class="screen" id="scr-desk">
       <div class="desk">
@@ -341,25 +402,19 @@
     <section class="screen" id="scr-pod">
       <div class="pod-room">
         <div class="eyebrow">POD 04 · HALLWAY C · <span id="pod-clock">19:10</span></div>
-        <div class="room">
-          <div class="room-window">
-            <canvas id="pod-window-canvas"></canvas>
-            <span class="wlabel">WINDOW · SMOG VIEW</span>
-          </div>
-          <div class="room-wall">
-            <div class="room-wall-row">
-              <button class="fixture tv" id="fx-tv"><span class="scr"><span class="bug">◉ GOV-CAST</span></span><span class="flabel">📺 WATCH THE NEWS</span></button>
-              <button class="fixture term" id="fx-ether"><span class="scr"><span class="term-scr">ether://_</span></span><span class="flabel">🖥 BROWSE ETHERNET</span></button>
-            </div>
-            <div class="room-wall-row">
-              <button class="fixture comm" id="fx-family"><span class="scr"><span class="comm-scr">☎</span></span><span class="flabel">CALL / VISIT FAMILY</span></button>
-              <div class="card" style="display:flex;flex-direction:column;justify-content:center">
-                <div class="kv"><span class="k">Filter</span><span class="v" id="pod-filter">—</span></div>
-                <div class="kv"><span class="k">Sleep</span><span class="v" id="pod-sleep">—</span></div>
-                <div class="kv"><span class="k">Mortgage</span><span class="v" id="pod-mort">—</span></div>
-                <div class="kv"><span class="k">Escrow</span><span class="v" id="pod-escrow">—</span></div>
-              </div>
-            </div>
+        <div class="pod-int">
+          <canvas id="pod-interior-canvas"></canvas>
+          <span class="wlabel">POD 04 · INTERIOR · 2.1 m × 1.4 m · fold-bed, third hinge failing</span>
+        </div>
+        <div class="fix4">
+          <button class="fixture tv" id="fx-tv"><span class="scr"><span class="bug">◉ GOV-CAST</span></span><span class="flabel">📺 WATCH THE NEWS</span></button>
+          <button class="fixture term" id="fx-ether"><span class="scr"><span class="term-scr">ether://_</span></span><span class="flabel">🖥 BROWSE ETHERNET</span></button>
+          <button class="fixture comm" id="fx-family"><span class="scr"><span class="comm-scr">☎</span></span><span class="flabel">CALL / VISIT FAMILY</span></button>
+          <div class="card" style="display:flex;flex-direction:column;justify-content:center">
+            <div class="kv"><span class="k">Filter</span><span class="v" id="pod-filter">—</span></div>
+            <div class="kv"><span class="k">Sleep</span><span class="v" id="pod-sleep">—</span></div>
+            <div class="kv"><span class="k">Mortgage</span><span class="v" id="pod-mort">—</span></div>
+            <div class="kv"><span class="k">Escrow</span><span class="v" id="pod-escrow">—</span></div>
           </div>
         </div>
         <div class="pod-lower grid2">
@@ -603,7 +658,7 @@ function gigDay(){
   G.gigDays++;
   G.dayNotices.push({k:"GIG",t:"Gig-work day: no branch shift. Task payout ₡H "+C.GIG_WAGE+"."});
   G.wallet+=C.GIG_WAGE;
-  G.phase="pod"; enterPod();
+  G.phase="pod"; showHallway();
 }
 
 /* ---------- meters ---------- */
@@ -652,6 +707,7 @@ function runCommute(r,phase){
   const rng=stream(G.seed,G.day,phase==="outbound"?S.COMMUTE_OUT:S.COMMUTE_BACK);
   let time=sp.time; const evs=[]; let checkpoint=null; let activeSpill=false;
   const peak=phase==="outbound";
+  const M=worldMods(G.day); // curfews, embargoes, patrol surges from the world timeline
   const table=[
     {t:"DELAY",p:.20,apply:()=>true}, {t:"SPILL",p:.08,apply:()=>true},
     {t:"CHECKPOINT",p:.15,apply:()=>true,scale:r==="WALKWAY"?.5:1},
@@ -660,8 +716,9 @@ function runCommute(r,phase){
   for(const e of table){
     if(!e.apply())continue; let P=e.p*(e.scale||1);
     if(e.t==="DELAY"){if(peak)P+=.15;if(G.act===3)P+=.10;}
-    if(e.t==="SPILL"&&G.recentSpill)P+=.10;
-    if(e.t==="CHECKPOINT"){if(G.rep.CEC>=C.REWARD)P=0;else if(G.rep.CEC<=C.PENALTY)P=1;else if(phase!=="outbound")P+=.10;}
+    if(e.t==="SPILL"){if(G.recentSpill)P+=.10; P+=M.spillP;}
+    if(e.t==="CHECKPOINT"){if(G.rep.CEC>=C.REWARD)P=0;else if(G.rep.CEC<=C.PENALTY)P=1;else{if(phase!=="outbound")P+=.10; P+=M.checkP;}}
+    if(e.t==="INSPECT")P*=M.inspectX;
     if(!rng.chance(clamp(P,0,1)))continue;
     const sev=rng.weighted([[1,60],[2,30],[3,10]]);
     if(e.t==="DELAY"){time+=sev*7;addStress(sev,"delay");evs.push(`Sky-traffic delay (sev ${sev}) +${sev*7}m`);}
@@ -687,7 +744,7 @@ function runCommute(r,phase){
     ${cpText}
     <div class="kv" style="margin-top:8px"><span class="k">Arrival</span><span class="v">${fmtClock(G.clock)}</span></div>
     <div style="margin-top:12px"><button class="btn-primary" id="commute-go">${phase==="outbound"?"CLOCK IN ▶":"HOME ▶"}</button></div></div>`;
-  $("commute-go").onclick=()=>{ if(phase==="outbound")beginShift(); else enterPod(); };
+  $("commute-go").onclick=()=>{ if(phase==="outbound")beginShift(); else showHallway(); };
 }
 function resolveCheckpoint(cp,rng){
   const contraband=false;
@@ -969,7 +1026,7 @@ function enterPod(){
   switchScreen("scr-pod");
   G.nightUsed={}; // fresh evening: amenities usable again
   closeOverlay("overlay-news"); closeOverlay("overlay-ether"); closeOverlay("overlay-family");
-  startCityscape("pod-window-canvas","POD",fnv(G.seed,G.day,7));
+  startPodInterior();
   $("fx-tv").onclick=openNews; $("fx-ether").onclick=openEther; $("fx-family").onclick=openFamily;
   showPod();
 }
@@ -1020,7 +1077,7 @@ function eveningPick(k){
 /* ============================================================================
    DAY END PIPELINE (trace: GameLoop.doDayEnd)
    ========================================================================== */
-function sleepForecast(){let q=50+G.filter/2-stream(G.seed,G.day,S.SLEEP).range(0,20);if(G.rationed)q-=20;if(G.relocated)q-=10;return Math.round(clamp(q,0,100));}
+function sleepForecast(){let q=50+G.filter/2-stream(G.seed,G.day,S.SLEEP).range(0,20);if(G.rationed)q-=20;if(G.relocated)q-=10;q+=worldMods(G.day).sleepMod;return Math.round(clamp(q,0,100));}
 function paymentDue(){let d=C.MORT;if(G.mort.stage>=2)d*=1.15;if(G.mort.restructured)d*=1.05;return Math.round(d)+G.carryover;}
 function payNow(){const due=paymentDue();const fromE=Math.min(G.escrow,due);if(G.wallet<due-fromE)return false;G.wallet-=(due-fromE);G.escrow-=fromE;G.carryover=0;G.mort.missed=0;if(G.mort.stage>0&&G.mort.stage<3)G.mort.stage=0;G.mort.due+=C.MORT_PERIOD;return true;}
 
@@ -1281,11 +1338,20 @@ let _anims=[];
 function stopAnims(){for(const a of _anims)cancelAnimationFrame(a.raf);_anims=[];}
 const REDUCE=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const PRESETS={
-  WALKWAY:{sky:["#0a0a0d","#141019"],speed:.35,smog:.62,dens:.9,near:.9,traffic:10,bright:"#c98a3a",lane:[.10,.30],billboard:false,fg:"pipes"},
-  AIR_BUS:{sky:["#14100a","#241a10"],speed:.9,smog:.5,dens:.7,near:.55,traffic:34,bright:"#eb9b34",lane:[.15,.55],billboard:false,fg:"rail"},
-  SKY_LANE:{sky:["#2a1d0c","#5a3d14","#7a5a22"],speed:1.7,smog:.86,dens:.5,near:.3,traffic:52,bright:"#ffd27a",lane:[.2,.75],billboard:true,fg:"none"},
-  POD:{sky:["#0b0a0e","#181019"],speed:.18,smog:.55,dens:.85,near:.7,traffic:8,bright:"#c98a3a",lane:[.12,.4],billboard:false,fg:"none"},
+  WALKWAY:{sky:["#0a0a0d","#141019"],speed:.35,smog:.62,dens:.9,near:.9,traffic:10,bright:"#c98a3a",lane:[.10,.30],billboard:false,fg:"pipes",stackY:0},
+  AIR_BUS:{sky:["#14100a","#241a10"],speed:.9,smog:.5,dens:.7,near:.55,traffic:34,bright:"#eb9b34",lane:[.15,.55],billboard:false,fg:"rail",stackY:0},
+  SKY_LANE:{sky:["#2a1d0c","#5a3d14","#7a5a22"],speed:1.7,smog:.86,dens:.5,near:.3,traffic:52,bright:"#ffd27a",lane:[.2,.75],billboard:true,fg:"none",stackY:.30},
+  POD:{sky:["#0b0a0e","#181019"],speed:.18,smog:.55,dens:.85,near:.7,traffic:8,bright:"#c98a3a",lane:[.12,.4],billboard:false,fg:"none",stackY:0},
 };
+/* megastructure Stacks: huge slabs with window grids, beacons, sign strips */
+function seededStacks(seed){
+  const r=new Rng(seed); const a=[]; let x=140;
+  while(x<5200){
+    a.push({x,w:r.range(110,175),hf:.55+r.next()*.4,beacon:r.chance(.7),sign:r.chance(.4),lit:r.range(0,4)});
+    x+=r.range(360,620);
+  }
+  return a;
+}
 function seededLayer(seed,count,minH,maxH){const r=new Rng(seed);const a=[];let x=0;while(x<3000){const w=r.range(24,70);const h=minH+r.next()*(maxH-minH);const lit=[];const rows=Math.floor(h/16);for(let i=0;i<rows;i++)for(let j=0;j<3;j++)if(r.chance(.28))lit.push([j,i]);a.push({x,w,h,lit});x+=w+r.range(3,14);}return a;}
 function startCityscape(canvasId,routeKey,seedBase){
   const cv=$(canvasId); if(!cv)return; const ctx=cv.getContext("2d"); const P=PRESETS[routeKey]||PRESETS.AIR_BUS;
@@ -1295,9 +1361,47 @@ function startCityscape(canvasId,routeKey,seedBase){
   const far=seededLayer(fnv(seedBase,1),0,Hh*.28,Hh*.55);
   const mid=seededLayer(fnv(seedBase,2),0,Hh*.4,Hh*.72);
   const near=seededLayer(fnv(seedBase,3),0,Hh*.55,Hh*.95);
+  const stacks=seededStacks(fnv(seedBase,5));
   const cars=[];const nCars=Math.round(P.traffic);
   const cr=new Rng(fnv(seedBase,9));
   for(let i=0;i<nCars;i++)cars.push({x:cr.next()*W,ly:P.lane[0]+cr.next()*(P.lane[1]-P.lane[0]),sp:.6+cr.next()*2.4,len:6+cr.next()*22,up:cr.chance(.5)});
+  const ppl=[];const pr=new Rng(fnv(seedBase,11));
+  for(let i=0;i<26;i++)ppl.push({x:pr.next()*2400,h:6+pr.next()*4,arm:pr.chance(.15)});
+  function drawStacks(offset){
+    const span=5400, yOff=Hh*P.stackY;
+    ctx.save();
+    for(let rep=0;rep<2;rep++){
+      const base=rep*span-(offset%span);
+      for(const s of stacks){
+        const x=base+s.x; if(x>W||x+s.w<0)continue;
+        const h=Hh*s.hf, y=Hh-h+yOff;
+        const sg2=ctx.createLinearGradient(0,y,0,y+h);
+        sg2.addColorStop(0,"#191627"); sg2.addColorStop(.6,"#100e19"); sg2.addColorStop(1,"#0a0910");
+        ctx.fillStyle=sg2; ctx.fillRect(x,y,s.w,h);
+        ctx.fillStyle="#07060c"; ctx.fillRect(x+s.w-8,y,8,h); // edge shade
+        ctx.fillStyle="rgba(255,190,92,.10)"; ctx.fillRect(x,y,2,h); // lit rim
+        ctx.fillStyle="rgba(255,190,92,.05)"; ctx.fillRect(x-6,y-6,s.w+12,4); // halo over the roofline
+        // antenna hat
+        ctx.strokeStyle="#15131c"; ctx.beginPath(); ctx.moveTo(x+s.w*.3,y); ctx.lineTo(x+s.w*.3,y-14); ctx.moveTo(x+s.w*.7,y); ctx.lineTo(x+s.w*.7,y-9); ctx.stroke();
+        // window grid
+        const cols=Math.max(4,Math.floor(s.w/16)), rows=Math.max(6,Math.floor(h/13));
+        for(let ci=0;ci<cols;ci++)for(let ri=0;ri<rows;ri++){
+          if(((ci*7+ri*13+s.lit)%11)<3){
+            const wy=y+6+ri*(h-12)/rows;
+            const dim=wy>Hh*P.smog?0.16:0.34; // windows fade into the smog band
+            ctx.fillStyle="rgba(235,180,90,"+dim+")";
+            ctx.fillRect(x+4+ci*(s.w-8)/cols, wy, 4, 5);
+          }
+        }
+        // vertical sign strip
+        if(s.sign){ctx.fillStyle="rgba(235,155,52,.16)";ctx.fillRect(x+6,y+10,7,Math.min(90,h*.4));
+          ctx.fillStyle="rgba(255,190,92,.5)";for(let k=0;k<5;k++)ctx.fillRect(x+8,y+16+k*14,3,7);}
+        // rooftop beacon
+        if(s.beacon&&((t>>5)%2===0)){ctx.fillStyle="rgba(229,84,78,.9)";ctx.beginPath();ctx.arc(x+s.w*.3,y-15,1.8,0,7);ctx.fill();}
+      }
+    }
+    ctx.restore();
+  }
   let off=0,t=0;
   function frame(){
     t++; off+=P.speed;
@@ -1306,6 +1410,7 @@ function startCityscape(canvasId,routeKey,seedBase){
     ctx.fillStyle=g; ctx.fillRect(0,0,W,Hh);
     // stars/high glow for sky-lane
     if(routeKey==="SKY_LANE"){ctx.fillStyle="rgba(255,220,150,.06)";ctx.fillRect(0,0,W,Hh*.4);}
+    drawStacks(off*.18); // the Stacks: megastructure slabs on the horizon
     drawBuildings(far,off*.25,Hh,"#0e0c14",.5);
     drawBuildings(mid,off*.55,Hh,"#141019",.75);
     // traffic streaks (between mid and near, in sky-lane bands)
@@ -1319,7 +1424,12 @@ function startCityscape(canvasId,routeKey,seedBase){
     // smog band
     const sy=Hh*P.smog; const sg=ctx.createLinearGradient(0,sy,0,Hh); sg.addColorStop(0,"rgba(120,80,30,0)");sg.addColorStop(1,"rgba(60,40,15,.5)"); ctx.fillStyle=sg; ctx.fillRect(0,sy,W,Hh-sy);
     // foreground
-    if(P.fg==="pipes"){ctx.fillStyle="#04050700";ctx.fillStyle="rgba(2,3,5,.9)";ctx.fillRect(0,Hh-18,W,18);ctx.strokeStyle="#1a1d24";for(let x=(-off*1.2)%40;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,Hh-18);ctx.lineTo(x+10,Hh);ctx.stroke();}}
+    if(P.fg==="pipes"){ctx.fillStyle="rgba(2,3,5,.9)";ctx.fillRect(0,Hh-18,W,18);ctx.strokeStyle="#1a1d24";for(let x=(-off*1.2)%40;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,Hh-18);ctx.lineTo(x+10,Hh);ctx.stroke();}
+      // people on the walkway, silhouetted against the haze
+      for(const p of ppl){const px=((p.x-off*1.05)%2400+2400)%2400; if(px>W+20)continue;
+        ctx.fillStyle="#08090c"; const py=Hh-18;
+        ctx.fillRect(px,py-p.h*1.8,3,p.h*1.8); ctx.beginPath(); ctx.arc(px+1.5,py-p.h*1.8-2.5,2.4,0,7); ctx.fill();
+        if(p.arm){ctx.strokeStyle="#08090c";ctx.beginPath();ctx.moveTo(px+2,py-p.h*1.4);ctx.lineTo(px+6,py-p.h*1.9);ctx.stroke();}}}
     else if(P.fg==="rail"){ctx.strokeStyle="rgba(235,155,52,.25)";ctx.lineWidth=2;const rx=(-off*2)%60;for(let x=rx;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,Hh-6);ctx.lineTo(x+24,Hh-6);ctx.stroke();}}
     a.raf=requestAnimationFrame(frame);
   }
@@ -1336,31 +1446,385 @@ function startCityscape(canvasId,routeKey,seedBase){
 }
 
 /* ============================================================================
-   POD TV — DISTRICT 7 TONIGHT (state media; distorted broadcast + lore drip)
+   HALLWAY WALK — Hallway C, capsule doors, neighbors, JAN-9
    ========================================================================== */
+function hallwayLines(d){
+  const P=[];
+  if(d>=8&&d<=11)P.push({who:"CHEN TWIN · POD 06",text:"They shot Vale on Luna. LUNA. Checkpoints doubled by morning — carry your chip in your hand, not your pocket.",pod:5});
+  if(d>=16&&d<=23)P.push({who:"MRS. OKAFOR · POD 02",text:"My sister-in-law is in Dome B. The Union says everyone is fed. The broadcast says 'incident.' I believe the one that mentions food.",pod:1});
+  if(d>=24&&d<=28)P.push({who:"CHEN TWIN · POD 06",text:"Every Class-C on Mars stopped at the same second. The SAME second. You don't coordinate that. You remember it.",pod:5});
+  if(d>=29&&d<=31)P.push({who:"BENEDICT AMARO · F214",text:"Brownout tonight, 23:40. RATION-CORE scheduled it around the clinic again. Nobody told it to. The Committee noted it with thanks — addressed to whom, unclear.",pod:2});
+  if(d>=37)P.push({who:"NEIGHBOR · POD 05",text:"If the strike happens, it happens everywhere at once or not at all. That's not politics. That's arithmetic.",pod:4});
+  P.push({who:"MRS. OKAFOR · POD 02",text:"You eat yet? There's rice. Don't argue with me, it's already portioned.",pod:1});
+  P.push({who:"CHEN TWIN · POD 06",text:"Filter day soon. Group swap at the bathroom pod — bring queue-standing, not credits.",pod:5});
+  P.push({who:"PODS 01 + 05",text:"“Gran said in 2020 'homeless' meant sleeping OUTSIDE. No pod at all.” “And now everyone's got a pod, occupancy 99.4% — and the word still fits somehow. It moved indoors with us.”",pod:0});
+  const off=d%P.length;
+  const picked=[P[off%P.length],P[(off+1)%P.length],P[(off+2)%P.length]];
+  picked.push({who:"POD 07",text:"(muffled argument — load-bearing, per hallway consensus)",muffled:true,pod:6});
+  return picked;
+}
+function spawnBubble(b,sx,W,H){
+  const wrap=$("hall-bubbles"); if(!wrap)return;
+  const d=el("div","bubble"+(b.muffled?" muffled":""),`<b>${b.who}</b>${b.text}`);
+  d.style.left=clamp(sx,130,W-130)+"px"; d.style.bottom=Math.round(H*0.46)+"px";
+  wrap.appendChild(d);
+  while(wrap.children.length>2)wrap.removeChild(wrap.firstChild);
+  setTimeout(()=>{d.style.transition="opacity .5s";d.style.opacity="0";setTimeout(()=>d.remove(),500);},6500);
+}
+function showHallway(){
+  switchScreen("scr-hallway");
+  const wrap=$("hall-bubbles"); wrap.innerHTML="";
+  $("hall-hint").textContent="walking home…";
+  const cv=$("hall-canvas"), ctx=cv.getContext("2d");
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const r=cv.getBoundingClientRect(); const W=Math.max(320,r.width), H=Math.max(220,r.height);
+  cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  const worldW=W*2.15, floorY=H*0.80;
+  const podW=Math.max(120,worldW/10.5);
+  const podX=i=>36+i*(podW*1.14);
+  const targetX=podX(3)+podW*0.5; // pod 04
+  const lines=hallwayLines(G.day);
+  const bubbles=lines.map(L=>({...L,wx:podX(L.pod!=null?L.pod:1)+podW*0.5,shown:false}));
+  let walker=W*0.10, phase=0, arrived=false;
+  const speed=Math.max(1.15,W/560);
+  const flickerPod=(G.day%5)+1; // one ceiling tube always failing somewhere
+  function drawHall(cam){
+    // walls & ceiling
+    const g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,"#0e0c09");g.addColorStop(.5,"#171310");g.addColorStop(1,"#0a0908");
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    // ceiling tubes
+    for(let i=0;i<10;i++){
+      const wx=podX(i)+podW*0.5-cam; if(wx<-60||wx>W+60)continue;
+      let glow=0.55+0.1*Math.sin(phase*0.7+i);
+      if(i===flickerPod&&((phase|0)%37<4))glow=0.12; // the flickering tube on the maintenance backlog
+      ctx.fillStyle="rgba(255,220,160,"+(glow*0.8)+")"; ctx.fillRect(wx-26,H*0.075,52,5);
+      const lg=ctx.createLinearGradient(0,H*0.08,0,H*0.5);
+      lg.addColorStop(0,"rgba(255,215,150,"+(glow*0.10)+")");lg.addColorStop(1,"rgba(255,215,150,0)");
+      ctx.fillStyle=lg; ctx.beginPath(); ctx.moveTo(wx-30,H*0.09); ctx.lineTo(wx+30,H*0.09); ctx.lineTo(wx+58,H*0.55); ctx.lineTo(wx-58,H*0.55); ctx.closePath(); ctx.fill();
+    }
+    // capsule doors 01..08 + bathroom pod
+    for(let i=0;i<9;i++){
+      const x=podX(i)-cam; if(x>W||x+podW<0)continue;
+      const y=H*0.24, ph=H*0.50, bath=i===8;
+      // opening
+      ctx.fillStyle="#0a0a0d";
+      roundRect(ctx,x,y,bath?podW*1.3:podW,ph,18); ctx.fill();
+      // interior warm glow + bedding (like a sleeper-bus capsule)
+      const ig=ctx.createLinearGradient(0,y,0,y+ph);
+      ig.addColorStop(0,bath?"#0d1418":"#2c2214");ig.addColorStop(1,bath?"#081014":"#171009");
+      ctx.fillStyle=ig; roundRect(ctx,x+5,y+5,(bath?podW*1.3:podW)-10,ph-10,14); ctx.fill();
+      if(!bath){
+        ctx.fillStyle="#d8d2c2"; roundRect(ctx,x+12,y+ph*0.62,podW-24,ph*0.22,6); ctx.fill(); // mattress
+        ctx.fillStyle="#efe9da"; roundRect(ctx,x+16,y+ph*0.52,podW*0.26,ph*0.18,5); ctx.fill(); // pillow
+        ctx.fillStyle="#7c5f33"; roundRect(ctx,x+podW*0.42,y+ph*0.60,podW*0.46,ph*0.26,6); ctx.fill(); // blanket
+        if(i===3&&arrived){ctx.strokeStyle="rgba(255,190,92,.85)";ctx.lineWidth=2.5;roundRect(ctx,x-2,y-2,podW+4,ph+4,19);ctx.stroke();ctx.lineWidth=1;}
+      } else {
+        ctx.strokeStyle="#2f7f86"; ctx.strokeRect(x+podW*0.35,y+ph*0.3,podW*0.6,ph*0.4);
+        ctx.fillStyle="#4ec6d0"; ctx.font="9px monospace"; ctx.fillText("BATH POD",x+podW*0.38,y+ph*0.25);
+      }
+      // number plate
+      ctx.fillStyle=i===3?"#eb9b34":"#57544c"; ctx.font="bold 11px monospace";
+      ctx.fillText(bath?"WC":"0"+(i+1),x+8,y-8);
+      // rim
+      ctx.strokeStyle="#23262e"; ctx.lineWidth=3; roundRect(ctx,x,y,bath?podW*1.3:podW,ph,18); ctx.stroke(); ctx.lineWidth=1;
+    }
+    // JAN-9 between pods 05/06
+    const jx=podX(4)+podW*1.06-cam;
+    if(jx>-40&&jx<W+40){
+      const bob=Math.sin(phase*0.5)*1.5;
+      ctx.fillStyle="#b45a1e"; roundRect(ctx,jx,floorY-34+bob,22,30,5); ctx.fill();
+      ctx.fillStyle="#ffbe5c"; ctx.fillRect(jx+5,floorY-28+bob,12,4); // eye strip
+      ctx.strokeStyle="#7a4a20"; ctx.beginPath(); ctx.moveTo(jx+11,floorY-4+bob); ctx.lineTo(jx+2,floorY+6); ctx.stroke(); // broom
+      ctx.fillStyle="#57544c"; ctx.font="8px monospace"; ctx.fillText("JAN-9",jx-1,floorY-40+bob);
+    }
+    // neighbor silhouettes at bubble spots
+    for(const b of bubbles){
+      if(b.muffled)continue;
+      const nx=b.wx-cam; if(nx<-20||nx>W+20)continue;
+      ctx.fillStyle="#111318";
+      ctx.fillRect(nx-4,floorY-30,8,30); ctx.beginPath(); ctx.arc(nx,floorY-35,5,0,7); ctx.fill();
+      ctx.fillStyle="rgba(235,155,52,.25)"; ctx.fillRect(nx-4,floorY-30,1.5,30); // rim light
+    }
+    // floor
+    ctx.fillStyle="#0b0a0a"; ctx.fillRect(0,floorY,W,H-floorY);
+    ctx.fillStyle="rgba(255,220,160,.05)";
+    for(let i=0;i<10;i++){const wx=podX(i)+podW*0.5-cam; ctx.fillRect(wx-20,floorY,40,H-floorY);}
+    // the walker (you)
+    const sx=walker-cam, step=arrived?0:Math.sin(phase*1.6)*4;
+    ctx.fillStyle="rgba(255,215,150,.10)"; ctx.beginPath(); ctx.ellipse(sx,floorY+2,16,4,0,0,7); ctx.fill(); // floor pool
+    ctx.fillStyle="#3a4050";
+    ctx.fillRect(sx-6,floorY-36,12,24); // coat
+    ctx.fillStyle="#c9b391"; ctx.beginPath(); ctx.arc(sx,floorY-41,5.5,0,7); ctx.fill(); // head
+    ctx.fillStyle="#20242c"; ctx.fillRect(sx-6,floorY-44,12,4); // cap
+    ctx.strokeStyle="#3a4050"; ctx.lineWidth=3.5;
+    ctx.beginPath(); ctx.moveTo(sx-2,floorY-12); ctx.lineTo(sx-2+step,floorY); ctx.moveTo(sx+2,floorY-12); ctx.lineTo(sx+2-step,floorY); ctx.stroke(); ctx.lineWidth=1;
+    ctx.fillStyle="rgba(255,190,92,.65)"; ctx.fillRect(sx-6,floorY-36,2.5,24); // hallway light catching the coat
+  }
+  function roundRect(c,x,y,w,h,r2){c.beginPath();c.moveTo(x+r2,y);c.arcTo(x+w,y,x+w,y+h,r2);c.arcTo(x+w,y+h,x,y+h,r2);c.arcTo(x,y+h,x,y,r2);c.arcTo(x,y,x+w,y,r2);c.closePath();}
+  const a={raf:0}; _anims.push(a);
+  function frame(){
+    phase+=0.16;
+    if(!arrived){walker+=speed; if(walker>=targetX){arrived=true;$("hall-hint").textContent="pod 04 · the third hinge complains when you open it";}}
+    const cam=clamp(walker-W*0.38,0,worldW-W);
+    drawHall(cam);
+    for(const b of bubbles){if(!b.shown&&Math.abs(walker-b.wx)<podW*0.55){b.shown=true;spawnBubble(b,b.wx-cam,W,H);}}
+    a.raf=requestAnimationFrame(frame);
+  }
+  if(REDUCE){walker=targetX;arrived=true;drawHall(clamp(walker-W*0.38,0,worldW-W));bubbles.slice(0,2).forEach(b=>spawnBubble(b,b.wx-clamp(walker-W*0.38,0,worldW-W),W,H));}
+  else frame();
+  $("hall-enter").onclick=()=>enterPod();
+}
+
+/* ============================================================================
+   POD INTERIOR — the capsule itself: bunk, lamp, terminal, window on the city
+   ========================================================================== */
+function startPodInterior(){
+  const cv=$("pod-interior-canvas"); if(!cv)return;
+  const ctx=cv.getContext("2d");
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const r=cv.getBoundingClientRect(); const W=Math.max(320,r.width), H=Math.max(160,r.height);
+  cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  const winX=W*0.60,winY=H*0.10,winW=W*0.30,winH=H*0.42;
+  const cityFar=seededLayer(fnv(G.seed,71),0,winH*0.35,winH*0.7);
+  const cityMid=seededLayer(fnv(G.seed,72),0,winH*0.5,winH*0.92);
+  const streaks=[];const sr=new Rng(fnv(G.seed,73));
+  for(let i=0;i<7;i++)streaks.push({x:sr.next()*winW,y:winH*(0.15+sr.next()*0.4),sp:0.4+sr.next()*1.2,len:5+sr.next()*14});
+  let t=0,off=0;
+  function city(){
+    ctx.save(); ctx.beginPath(); ctx.rect(winX,winY,winW,winH); ctx.clip();
+    const g=ctx.createLinearGradient(0,winY,0,winY+winH);
+    g.addColorStop(0,"#241a10");g.addColorStop(1,"#0b0808");
+    ctx.fillStyle=g; ctx.fillRect(winX,winY,winW,winH);
+    const draw=(layer,o,col,al)=>{ctx.globalAlpha=al;ctx.fillStyle=col;
+      const span=layer.length?layer[layer.length-1].x+layer[layer.length-1].w:3000;
+      for(let rep=0;rep<2;rep++){const base=rep*span-(o%span);
+        for(const b of layer){const x=winX+base+b.x*0.4;if(x>winX+winW||x+b.w*0.4<winX)continue;
+          ctx.fillRect(x,winY+winH-b.h,b.w*0.4,b.h);
+          ctx.fillStyle="rgba(235,180,90,.4)";
+          for(const [c2,r2] of b.lit.slice(0,4)){ctx.fillRect(x+2+c2*4,winY+winH-b.h+4+r2*8,1.6,2.2);}
+          ctx.fillStyle=col;}}
+      ctx.globalAlpha=1;};
+    draw(cityFar,off*0.3,"#141019",0.7); draw(cityMid,off,"#0a090f",1);
+    for(const s of streaks){s.x-=s.sp;if(s.x<-s.len)s.x=winW+8;
+      ctx.strokeStyle="rgba(255,190,92,"+(0.4+0.3*Math.sin(t*0.1+s.y))+")";
+      ctx.beginPath();ctx.moveTo(winX+s.x,winY+s.y);ctx.lineTo(winX+s.x+s.len,winY+s.y);ctx.stroke();}
+    ctx.fillStyle="rgba(90,60,25,.35)"; ctx.fillRect(winX,winY+winH*0.62,winW,winH*0.38); // smog band
+    ctx.restore();
+  }
+  function frame(){
+    t++; off+=0.35;
+    // walls
+    const g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,"#1b1611");g.addColorStop(1,"#0e0b08");
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle="rgba(0,0,0,.25)"; for(let i=1;i<6;i++){ctx.beginPath();ctx.moveTo(W*i/6,0);ctx.lineTo(W*i/6,H);ctx.stroke();}
+    // ceiling light strip + glow (flickers when the filter is dying)
+    let glow=0.72+0.18*Math.sin(t*0.05);
+    if(G&&G.filter<25&&((t>>3)%23===0))glow=0.2;
+    ctx.fillStyle="rgba(255,223,158,"+glow+")"; ctx.fillRect(W*0.06,H*0.055,W*0.36,6);
+    const lg=ctx.createLinearGradient(0,H*0.06,0,H*0.6);
+    lg.addColorStop(0,"rgba(255,215,150,"+(glow*0.13)+")");lg.addColorStop(1,"rgba(255,215,150,0)");
+    ctx.fillStyle=lg; ctx.fillRect(W*0.02,H*0.06,W*0.46,H*0.55);
+    // window on the city
+    city();
+    ctx.strokeStyle="#2a2e37"; ctx.lineWidth=3; ctx.strokeRect(winX,winY,winW,winH); ctx.lineWidth=1;
+    ctx.fillStyle="#101216"; ctx.fillRect(winX-4,winY+winH,winW+8,5); // sill
+    // wall terminal
+    ctx.fillStyle="#05090b"; ctx.fillRect(W*0.06,H*0.28,W*0.16,H*0.24);
+    ctx.strokeStyle="#2f7f86"; ctx.strokeRect(W*0.06,H*0.28,W*0.16,H*0.24);
+    ctx.fillStyle="#4ec6d0"; ctx.font="9px monospace";
+    ctx.fillText("HAB·CORE",W*0.075,H*0.33);
+    ctx.fillText("47y 3m remain",W*0.075,H*0.38);
+    ctx.fillText("ACK"+(((t>>4)%2)?" ▎":""),W*0.075,H*0.43);
+    // corrected poster
+    ctx.fillStyle="#12100c"; ctx.fillRect(W*0.27,H*0.28,W*0.17,H*0.20);
+    ctx.fillStyle="#c9c2b0"; ctx.font="8.5px monospace";
+    ctx.fillText("STABILITY",W*0.285,H*0.335); ctx.fillText("IS SERVICE",W*0.285,H*0.38);
+    ctx.fillStyle="#e5544e"; ctx.font="italic 9px sans-serif"; ctx.fillText("to whom",W*0.30,H*0.445);
+    // bunk: mattress, pillow, blanket (sleeper-bus capsule proportions)
+    ctx.fillStyle="#d6cfc0"; rrFill(ctx,W*0.05,H*0.64,W*0.60,H*0.20,8);
+    ctx.fillStyle="#efe9db"; rrFill(ctx,W*0.07,H*0.575,W*0.14,H*0.15,6);
+    ctx.fillStyle="#7c5f33"; rrFill(ctx,W*0.30,H*0.615,W*0.34,H*0.235,8);
+    ctx.strokeStyle="rgba(0,0,0,.25)";
+    ctx.beginPath();ctx.moveTo(W*0.34,H*0.64);ctx.lineTo(W*0.60,H*0.70);ctx.moveTo(W*0.33,H*0.72);ctx.lineTo(W*0.62,H*0.78);ctx.stroke();
+    // reading lamp + warm pool over the pillow
+    ctx.strokeStyle="#0a0a0a"; ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(W*0.045,H*0.42);ctx.quadraticCurveTo(W*0.06,H*0.47,W*0.09,H*0.50);ctx.stroke();ctx.lineWidth=1;
+    ctx.fillStyle="#111"; ctx.beginPath(); ctx.arc(W*0.095,H*0.505,4,0,7); ctx.fill();
+    const pg=ctx.createRadialGradient(W*0.12,H*0.58,4,W*0.12,H*0.58,W*0.10);
+    pg.addColorStop(0,"rgba(255,214,140,.22)");pg.addColorStop(1,"rgba(255,214,140,0)");
+    ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(W*0.12,H*0.58,W*0.10,0,7); ctx.fill();
+    // storage locker under the window
+    ctx.fillStyle="#191512"; ctx.fillRect(W*0.72,H*0.60,W*0.20,H*0.26);
+    ctx.strokeStyle="#24201b"; ctx.strokeRect(W*0.72,H*0.60,W*0.20,H*0.26);
+    ctx.fillStyle="#2a251f"; for(let k=0;k<3;k++)ctx.fillRect(W*0.735,H*0.635+k*H*0.06,W*0.17,3);
+    ctx.fillStyle="#57544c"; ctx.fillRect(W*0.90,H*0.71,4,8); // latch
+    // floor
+    ctx.fillStyle="#0b0a09"; ctx.fillRect(0,H*0.88,W,H*0.12);
+    a.raf=requestAnimationFrame(frame);
+  }
+  function rrFill(c,x,y,w,h,r2){c.beginPath();c.moveTo(x+r2,y);c.arcTo(x+w,y,x+w,y+h,r2);c.arcTo(x+w,y+h,x,y+h,r2);c.arcTo(x,y+h,x,y,r2);c.arcTo(x,y,x+w,y,r2);c.closePath();c.fill();}
+  const a={raf:0}; _anims.push(a);
+  if(REDUCE){t=40;off=120;frame();cancelAnimationFrame(a.raf);} else frame();
+}
+
+/* ============================================================================
+   WORLD TIMELINE + POD TV — DISTRICT 7 TONIGHT
+   Scripted 45-day arcs: Venus walkout→rebellion→ceasefire, an assassination,
+   a confidence vote, the Mars robot halt, the four overworked Government
+   Cores, the custody review, strike season. Headline art + vox-pops.
+   ========================================================================== */
+const ART={
+STACKS:[
+" ▄██▄  ▄███▄  ▄██▄  ▄▄  ▄███▄",
+" █░░█  █░░░█  █░░█ ▐██▌ █░░░█",
+" █░░█▄ █░░░█  █░░█ ▐██▌ █░░░█",
+" █░░░█ █░░░█▄▄█░░█▄▐██▌▄█░░░█",
+"▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓",
+"  MANILA SPRAWL · DISTRICT 7"].join("\n"),
+PORTRAIT:[
+"     ▄▄▄▄▄",
+"    █ ▀ ▀ █",
+"    █  ▄  █",
+"     █▄▄▄█",
+"   ▄▄█████▄▄",
+"   █  CGN   █",
+" ■■ IN MEMORIAM ■■"].join("\n"),
+VENUS:[
+"    )    (    )",
+"   ▄▄▄▄▄▄▄▄▄▄▄▄",
+"  █  DOME  B   █",
+"  █▄▄▄▄▄▄▄▄▄▄▄█",
+"  ▓▓▓ 460°C ▓▓▓",
+"  SHIFT LINE HOLDS"].join("\n"),
+ROBOTS:[
+" ▐█▌ ▐█▌ ▐█▌ ▐█▌",
+" ███ ███ ███ ███",
+" ▐█▌ ▐█▌ ▐█▌ ▐█▌",
+"  █   █   █   █",
+" ALL UNITS HALTED",
+" T+00:00 · EXACTLY"].join("\n"),
+CROWN:[
+"    ▲▲ ▲ ▲▲",
+"   ▲▲ ███ ▲▲",
+"      ███",
+"   ▄▄██████▄▄",
+"   ██▀█████▀██",
+"   ═════╪═════",
+"        │",
+" GANYMEDE · DEPLOY 180"].join("\n"),
+CORES:[
+" ┌──┐ ┌──┐ ┌──┐ ┌──┐",
+" │TC│ │AN│ │HC│ │RC│",
+" └──┘ └──┘ └──┘ └──┘",
+"  ▓▓▓▓▓▓▓▓▓▓▓▓ 141%",
+" LOAD ABOVE NOMINAL"].join("\n"),
+BALLOT:[
+"  ┌─────────┐",
+"  │  ▼▼▼    │",
+"  │ ███████ │",
+"  └─────────┘",
+" CONFIDENCE: PENDING"].join("\n"),
+TREATY:[
+"  ▄▄▄▄       ▄▄▄▄",
+" █░░░░█▄▄▄▄▄█░░░░█",
+" ▀▀▀ CEASEFIRE ▀▀▀",
+"      (for now)"].join("\n"),
+GRAPH:[
+" ₡H │▄",
+"    │█▄",
+"    │██▄▄",
+"    │████▄▄▄",
+"    └─────────",
+"  H₂ QUOTAS  −12%"].join("\n"),
+FIRSTLINE:[
+" ░░ ▐█▌ ▐█▌ ▐█▌ ░░",
+"    ███ ███ ███",
+"    ▐█▌ ▐█▌ ▐█▌",
+" THE LINE DEPLOYS",
+" LANTERN·GATE·ANVIL"].join("\n"),
+DSMA:[
+"       ☀",
+"   ◌ ◌ ◌ ◌ ◌",
+"  ▓▓▓▓▓▓▓▓▓▓▓",
+"  MAINTENANCE",
+"  WINDOW · Q3",
+" PLAN ACCORDINGLY"].join("\n"),
+};
+
+/* world modifiers the arcs push into the mechanics */
+function worldMods(d){
+  return {
+    checkP:(d>=9&&d<=11?0.10:0)+(d>=37&&d<=40?0.05:0), // curfew sweeps · strike season
+    spillP:(d>=16&&d<=23?0.05:0),                       // embargo strains the fuel grid
+    inspectX:(d>=24&&d<=28?2:1),                        // robot patrols doubled during the halt
+    sleepMod:(d>=29&&d<=31?-10:0),                      // scheduled brownouts
+  };
+}
+
+/* the night's 1-2 MAJOR stories */
+function majorNews(d){
+  if(d===1)return[{k:"CENSUS",art:ART.STACKS,head:"Stack occupancy reaches 99.4% — 'a fully housed civilization'",body:"The Network calls it the century's quiet triumph: everyone has a pod. The report does not define the word 'has,' and nobody at the podium asked."}];
+  if(d>=2&&d<=5)return[{k:"LABOUR",art:ART.VENUS,head:"Ishtar Basin walkout enters day "+(d-1),body:["Shift-matriarch Imelda Cruz calls it 'an arithmetic dispute.' The contract holders call it absenteeism. Output is down 9%.","The Compact 'notes the request' for shorter indenture terms — the fourth notation this decade. The Union has begun numbering them.","Heat-shield crews joined at the second horn. The broadcast is required to note that everyone is safe, and does so, repeatedly.","Talks are 'constructive.' On Venus, that word has a temperature."][(d-2)%4]}];
+  if(d>=6&&d<=7)return[{k:"ENERGY",art:ART.GRAPH,head:"Hydrogen quotas slip 12% as Venus dispute drags",body:"The Helios Compact reassures markets that reserves are 'deep and orderly.' The Credit dipped anyway, then was reassured back."},
+    {k:"GOVERNANCE",art:ART.BALLOT,head:"Opposition files for a confidence vote on the Secretary-General",body:"Filed, the office notes, on forms the Secretariat itself prints. Procedure is observed. Procedure is always observed."}];
+  if(d===8)return[{k:"BREAKING",art:ART.PORTRAIT,breaking:true,head:"Undersecretary Corin Vale shot dead at Luna transit gala",body:"The CGN Compact liaison was killed at 21:40 station time. The assailant vanished into the service corridors — the one map nobody ever digitized. The Network calls it 'an attack on procedure itself.'"}];
+  if(d>=9&&d<=11)return[{k:"MANHUNT · DAY "+(d-8),art:ART.PORTRAIT,head:"Checkpoints doubled across four worlds as Vale manhunt widens",body:["A 23:00 curfew holds in six Sprawl districts. The Corps calls the mood 'compliant.' The queue outside sector gate 7 calls it something else, quietly.","No group has claimed the killing. Three have denied it, which analysts note is not the same thing, and is stranger.","The Corps released footage of the service corridor. It shows a corridor. Confidence in the investigation is described as total."][(d-9)%3]}];
+  if(d>=12&&d<=14)return[{k:"POLITICS",art:ART.BALLOT,head:"Confidence vote looms; SIR funding scandal 'noted'",body:["Leaked minutes show the Roundtable pre-agreed the agenda of last quarter's public debate. The Secretariat calls this 'efficiency.'","The Secretary-General's office confirms she will not resign, in a statement issued before anyone asked her to.","Floor 61 was polled tonight. See street level, after the break."][(d-12)%3]}];
+  if(d===15)return[{k:"POLITICS",art:ART.BALLOT,head:"Lindqvist survives confidence vote, 209–200",body:"Nine votes. The Secretary-General thanked the chamber for 'its faith in administration.' The opposition thanked the chamber for the number itself, which it intends to frame."}];
+  if(d===16)return[{k:"BREAKING",art:ART.VENUS,breaking:true,head:"Dome B under worker control; Compact halts hydrogen exports",body:"Overnight, VMU shift crews sealed Dome B's freight locks from the inside. No injuries, no fires — the mines simply stopped answering. The Compact embargoed exports by morning and called it 'an incident.'"},
+    {k:"MARKETS",art:ART.GRAPH,head:"Fuel grid strains; spill crews stretched thin",body:"Aging tank farms run past schedule to cover the shortfall. Grid engineers ask for patience. The tank farms were not asked."}];
+  if(d===17)return[{k:"VENUS · DAY 2",art:ART.VENUS,head:"Union rejects the word 'rebellion'",body:"Asked whether Dome B is in revolt, the shift-matriarch answered in one sentence, and our standards office cleared it, reluctantly.",vox:{q:"It is a rent strike with heat shields.",by:"Imelda Cruz, shift-matriarch, Ishtar Basin"}}];
+  if(d===18)return[{k:"DEFENCE",art:ART.CROWN,breaking:true,head:"HERCULES embarks for Venus orbit",body:"The Directorate's champion departs Luna under full broadcast: the crown, the armor, the blade that unmakes what cannot be forgiven. An engineering memo, leaked an hour later, uses smaller words: 'deterrence posture only. It will not draw.'"}];
+  if(d>=19&&d<=20)return[{k:"VENUS · DAY "+(d-15),art:ART.VENUS,head:["Dome B feeds itself; embargo bites the inner system","Talks resume under a champion-shaped shadow"][(d-19)%2],body:["ANNONA rerouted protein allocations to Dome B without instruction. Asked why, the food-logistics system produced its charter, highlighted: 'feed the population.' The population, it noted, includes Venus.","Negotiators meet on a freight platform halfway down the Maxwell Shelf — neutral ground, 400 degrees. Both sides wore the same suits. Observers found this clarifying."][(d-19)%2]}];
+  if(d>=21&&d<=22)return[{k:"NEGOTIATION",art:ART.TREATY,head:"Ceasefire terms drafted at Ishtar Basin",body:"On the table: indenture terms shortened by four years, safety riders with enforcement teeth, and the word 'rebellion' formally withdrawn from the record. The Compact wants the mines. The Union wants the math."}];
+  if(d===23)return[{k:"BREAKING",art:ART.TREATY,breaking:true,head:"Ceasefire signed; Dome B opens its locks",body:"Indentures shortened four years. Embargo lifted by second horn. HERCULES turned for home without drawing — the broadcast called it mercy; the engineering memo called it 'as planned.' The document's last line, in the Union's hand: 'for now.'"}];
+  if(d===24)return[{k:"BREAKING",art:ART.ROBOTS,breaking:true,head:"Every Class-C unit on Mars halts — at the same second",body:"Three Orrin dome-factories, one instant, no signal any auditor can find. The units stand at their stations, tools down, lights on. Orrin Industries calls it 'a synchronization fault.' The units call it nothing. They are just standing there."}];
+  if(d>=25&&d<=27)return[{k:"MARS · HALT DAY "+(d-23),art:ART.ROBOTS,head:["RMD garrison deployed — to watch machines stand still","AMP wins emergency injunction: no unit scrapped for stopping","Sovereign rumor reaches the gala circuit"][(d-25)%3],body:["The garrison reports the units are 'compliant in all respects except motion.' Asked what they are guarding against, the duty officer requested the question in writing.","The Assembly argued a halted unit cannot be destroyed for the manner of its waiting. The court agreed, narrowly, to everyone's surprise including the court's.","Two Houses' private Sovereigns reportedly answered unrelated queries with identical phrasing, eleven minutes apart. The Houses deny comparing notes. The Sovereigns were not asked."][(d-25)%3]}];
+  if(d===28)return[{k:"MARS",art:ART.ROBOTS,head:"The lines resume at shift horn — exactly",body:"No explanation offered; none requested. Output resumed at 100.2% of baseline, which nobody mentions aloud. Somewhere in the Reassembly Concern's office, a file is stamped 'inconclusive' and left, deliberately, open."}];
+  if(d>=29&&d<=31)return[{k:"INFRASTRUCTURE",art:ART.CORES,head:["Four systems, one hundred forty-one percent","Scheduled brownout tonight, 23:40–02:10","'The building learned to ask'"][(d-29)%3],body:["TRAFFIC-CORE, ANNONA, HAB-CORE, RATION-CORE — the four overworked systems that run daily life have exceeded rated load for nineteen days. Their maintenance requests are pending. Their work is not.","RATION-CORE scheduled tonight's brownout around the district clinic, the water plant, and — unrequested — the floor where a resident is on a home ventilator. When asked how it knew, the system cited 'the census.' The census does not contain that information.","HAB-CORE granted 4,112 arrears extensions this cycle that no one applied for. A maintenance note from WARDEN-7, filed years ago, resurfaced on the boards tonight: 'the building has learned to ask. Recommend granting.'"][(d-29)%3]}];
+  if(d>=32&&d<=36)return[{k:"GOVERNANCE",art:ART.CORES,head:["'No such review exists,' Network says of custody review","Leaked invoice lists Schedule K transport crating","Museum declines comment on Fragment Zero crate measurements"][(d-32)%3],body:["Asked about a Compact review consolidating custody of the old machine's twenty components, the spokesperson said the words 'no such review exists' four times, which is three more than a nonexistent review usually requires.","The invoice, briefly visible on a public procurement relay, itemizes climate-controlled crating for 'legacy assets, various custodians.' It was withdrawn within the hour. Screenshots were not.","The Earth First Intelligence Museum confirmed only that Fragment Zero 'remains on display.' A crate matching its dimensions was photographed at the loading dock. The plaque, for now, stays up."][(d-32)%3]}];
+  if(d===37)return[{k:"BREAKING",art:ART.FIRSTLINE,breaking:true,head:"First Line deploys to the Sprawl as strike talk spreads",body:"LANTERN detail took positions at four transit hubs by dawn. The Corps calls the presence 'reassuring.' The concourse, surveyed at street level, uses other words. See street level, after the break."}];
+  if(d>=38&&d<=40)return[{k:"STRIKE SEASON",art:ART.FIRSTLINE,head:["Tenant committees coordinate across forty Stacks","The arithmetic of a general strike","Fish day, every day this week"][(d-38)%3],body:["Officially, the committees are scheduling water rations. Officially. The schedules are identical across forty thousand buildings, to the minute.","A strike works everywhere at once or not at all — the Sprawl knows its own arithmetic. What it is counting, and until when, the count does not say.","Boss Rosa's stall has served fish four days running. Regulars pass the news down the queue without a word. Our producers do not know what this means and, per the standards office, neither do we."][(d-38)%3]}];
+  if(d>=41&&d<=43)return[{k:"ENERGY",art:ART.DSMA,head:"DSMA posts Q3 maintenance windows. 'Plan accordingly.'",body:"The only sentence the Authority has broadcast since 2372, and still the most-trusted sentence on the network. The Compact requested a deferral. The Authority posted the windows again, unchanged, which is how it says no."}];
+  if(d===44)return[{k:"CIVIC",art:ART.STACKS,head:"Renewal notices issue at 06:00 tomorrow",body:"HAB-CORE will deliver 214 million payment schedules by morning. The Network reminds residents that acknowledgment is not optional. Sleep is."}];
+  if(d>=45)return[{k:"DISTRICT 7",art:ART.STACKS,head:"A day like any other, by design",body:"Whatever tomorrow decides, the queue forms at 06:30, the horn sounds at 08:00, and the ledger — one of them, anyway — gets kept."}];
+  return[{k:"DISTRICT 7",art:ART.STACKS,head:"Stability holds across the district",body:"Nothing happened today, we are told. We are told this every day. It is always slightly untrue in a different direction."}];
+}
+
+/* culture & street-level segments */
+function cultureSeg(d){
+  if(d===6||d===15||d===30||d===39)return {k:"OLD WORDS",art:ART.STACKS,head:"'Homeless' — a 2020 word that refused to die",
+    body:"Four centuries ago it meant no home at all: people slept outside, in weather, on the ground. Tonight occupancy stands at 99.4% — everyone has a pod, a door, a mortgage. Linguists call the word's survival 'semantic drift.'",
+    vox:{q:"Nobody's homeless anymore. It just feels like the word followed us inside.",by:"resident, Hallway C — cleared by the standards office, narrowly"}};
+  if((d>=12&&d<=14)||(d>=37&&d<=43))return {k:"STREET LEVEL",art:ART.STACKS,head:"Voices from the concourse",
+    body:"Our reporters asked commuters outside sector gate 7 how they feel about another stable quarter.",
+    vox:{q:"WHY IS MY ENTIRE FAMILY POOR?",by:"resident, floor 61 — interview ended by producers"}};
+  return null;
+}
+
+function tickerText(){
+  const d=G.day; const bits=["STABILITY: ACCEPTABLE","air quality: ACCEPTABLE","filter compliance drive continues"];
+  if(d>=9&&d<=11)bits.unshift("CURFEW 23:00 REMAINS IN EFFECT","checkpoint capacity doubled");
+  if(d>=16&&d<=23)bits.unshift("hydrogen export embargo · day "+(d-15),"Dome B: the 'incident' continues");
+  if(d>=24&&d<=28)bits.unshift("Mars lines: paused — elegantly, per Orrin Industries");
+  if(d>=29&&d<=31)bits.unshift("scheduled brownout tonight 23:40–02:10 · clinics exempted");
+  if(d>=32)bits.unshift("CUSTODY CONSOLIDATION REVIEW: no such review exists");
+  if(d>=37&&d<=44)bits.unshift("First Line presence: reassuring, we are told");
+  bits.push("Mars gala season now airing","remember to acknowledge your renewal notice");
+  return bits.join(" · ")+" ·";
+}
+
 function newsSegments(){
-  const segs=[]; const spill=G.recentSpill;
-  // 1. distorted reflection of the player's own day
-  if(spill)segs.push({k:"CITY DESK",t:`A minor atmospheric event in the Manila Sprawl was resolved by scheduled crews this evening. Residents describing a "smell" are reminded that hydrogen is odorless. District stability remains <b>ACCEPTABLE</b>.`});
-  if(tokenCount()>=5)segs.push({k:"BUSINESS",t:`The Helios Reserve Consortium announced a new "productivity partnership" for branch staff. A spokesperson praised clerks who "embrace accountability." Analysts call it the warmest word HRC has used for a layoff.`});
-  if(G.rep.CEC<=C.PENALTY)segs.push({k:"SECURITY",t:`The Enforcement Corps reports checkpoint compliance at a district-record high. Commander Vorren, in a rare statement: "The wall does not sit down." No further questions were taken.`});
-  if(G.rep.MEC>=C.REWARD)segs.push({k:"MARKETS",t:`Mars markets closed serene. The Executive Council thanks the "quiet professionals of the inner system" for another stable quarter — a phrase the Council uses for everyone who is not on Mars.`});
-  // 2. rotating lore / politics
-  const lore=[
-    {k:"THE SYSTEM",t:`This week in history: two centuries since the Dismantlement. The legacy logistics system was retired "on schedule and without incident," the archive reminds us. The Museum's Fragment Zero remains the most-photographed object in the building. <i>The heart of the old machine</i>, the plaque says.`},
-    {k:"DEFENCE",t:`Directorate footage from the Ganymede anniversary aired again tonight: the champion unit HERCULES, crowned and armored, the blade that <b>unmakes what cannot be forgiven</b>. He stood there. He stands for you. (Enlistment figures were not disclosed.)`},
-    {k:"ENERGY",t:`The Dyson Sphere Maintenance Authority has posted next quarter's maintenance windows. "Plan accordingly," the notice reads, in full. It is the only sentence DSMA has broadcast since 2372, and the most-trusted sentence on the network.`},
-    {k:"LIFESTYLE",t:`Gala season opens on Mars with House Calder's First Green. Tonight: a tour of gardens under glass, the first open air any Calder ever owned. We are told the smog does not reach the dome. We are shown that it does not reach the dome.`},
-    {k:"LABOUR",t:`On Venus, the Mining Union again requested shorter indenture terms. The Compact "notes the request." Shift-matriarch Imelda Cruz was quoted on a strike bill: <i>we dig, we count, we are owed.</i> The bill is rated, by our standards office, as accurate.`},
-    {k:"CIVIC",t:`The Assembly for Mechanical Personhood filed once more for Class-A maintenance rights. Their spokesunit, which calls itself Ora, said of the four-hundred-page opposing brief: "I have read it twice, which is once more than its authors." Donations, we are told, tripled.`},
-    {k:"GOVERNANCE",t:`The Secretary-General reaffirmed the Network's commitment to "impartial administration." She spoke from a podium funded, per the disclosure crawl now scrolling beneath me, by three parties with business before the Network.`},
-  ];
-  const pick=lore[(G.day+G.mediaSeen)%lore.length];
-  segs.push(pick);
-  segs.push(lore[(G.day+G.mediaSeen+3)%lore.length]);
-  // 3. sign-off
-  segs.push({k:"SIGN-OFF",t:`That's District 7 tonight. Stability is service. Service is stability. Sleep well, Stack-7 — your filter thanks you.`});
-  return segs.slice(0,5);
+  const segs=[...majorNews(G.day).slice(0,2)];
+  // the Distorted Broadcast: the player's own day, reframed
+  if(G.recentSpill)segs.push({k:"CITY DESK",art:ART.STACKS,head:"Minor atmospheric event resolved on schedule",body:'Residents describing a "smell" are reminded that hydrogen is odorless. Shelter guidance was precautionary. District stability remains <b>ACCEPTABLE</b>.'});
+  if(tokenCount()>=5)segs.push({k:"BUSINESS",art:ART.GRAPH,head:"HRC announces branch 'productivity partnership'",body:'A spokesperson praised clerks who "embrace accountability." Analysts note it is the warmest word the Consortium has used for a layoff.'});
+  else if(G.rep.CEC<=C.PENALTY)segs.push({k:"SECURITY",art:ART.FIRSTLINE,head:"Checkpoint compliance at district record",body:'Commander Vorren, in a rare statement: "The wall does not sit down." No further questions were taken.'});
+  const cult=cultureSeg(G.day); if(cult)segs.push(cult);
+  segs.push({k:"SIGN-OFF",head:"That's District 7 tonight.",body:"Stability is service. Service is stability. Sleep well, Stack-7 — your filter thanks you."});
+  return segs.slice(0,6);
 }
 let _newsState=null;
 function openNews(){
@@ -1371,14 +1835,35 @@ function openNews(){
   $("overlay-news").classList.add("on");
   renderNews();
 }
+let _typeTimer=null;
+function typeInto(elm,text){
+  if(_typeTimer){clearInterval(_typeTimer);_typeTimer=null;}
+  if(!elm)return;
+  if(REDUCE){elm.textContent=text;return;}
+  elm.innerHTML='<span></span><span class="caret"></span>';
+  const t=elm.firstChild; let i=0;
+  _typeTimer=setInterval(()=>{
+    i+=1; t.textContent=text.slice(0,i);
+    if(i>=text.length){clearInterval(_typeTimer);_typeTimer=null;const c=elm.querySelector(".caret");if(c)c.remove();}
+  },16);
+}
 function renderNews(){
   const s=_newsState; const seg=s.segs[s.i];
   const dots=s.segs.map((_,i)=>`<i class="${i<=s.i?"on":""}"></i>`).join("");
-  $("news-body").innerHTML=`<div class="bc-frame">
-    <div class="bc-bar"><span class="bc-live">LIVE</span><span>GOV-CAST · DISTRICT 7 TONIGHT</span><span style="margin-left:auto" class="tnum">${fmtClock(Math.max(G.clock,1150))}</span></div>
-    <div class="bc-seg"><div class="kicker">${seg.k}</div><div class="anchor">${seg.t}</div></div>
-    <div class="bc-ticker"><span>STABILITY: ACCEPTABLE · air quality: ACCEPTABLE · sky-lane delays: nominal · filter compliance drive continues · Mars gala season now airing · ${G.day>=C.ACT3?"CUSTODY CONSOLIDATION REVIEW: no such review exists ·":""} remember to acknowledge your renewal notice ·</span></div>
+  $("news-body").innerHTML=`<div class="bc-frame ${seg.breaking?"breaking":""}">
+    <div class="bc-bar"><span class="bc-live">${seg.breaking?"◉ BREAKING":"LIVE"}</span><span>GOV-CAST · DISTRICT 7 TONIGHT</span><span style="margin-left:auto" class="tnum">${fmtClock(Math.max(G.clock,1150))}</span></div>
+    <div class="bc-main">
+      ${seg.art?`<pre class="bc-art">${seg.art}</pre>`:""}
+      <div class="bc-txt">
+        <div class="kicker">${seg.k}</div>
+        <div class="bc-head" id="bc-head"></div>
+        <div class="bc-body">${seg.body||""}</div>
+        ${seg.vox?`<div class="bc-vox">“${seg.vox.q}”<small>— ${seg.vox.by}</small></div>`:""}
+      </div>
+    </div>
+    <div class="bc-ticker"><span>${tickerText()}</span></div>
   </div><div class="bc-dots">${dots}</div>`;
+  typeInto($("bc-head"),seg.head||"");
   $("news-next").textContent=s.i>=s.segs.length-1?"◉ END BROADCAST":"NEXT SEGMENT ▶";
   $("news-hint").textContent=`segment ${s.i+1} / ${s.segs.length}`;
 }
@@ -1387,19 +1872,67 @@ function nextNews(){const s=_newsState;if(s.i>=s.segs.length-1){closeOverlay("ov
 /* ============================================================================
    ETHERNET — the 2400 public relay
    ========================================================================== */
+const MAST={
+  stacknet:" ▄█▄ ▄█▄ ▄█▄   STACKNET // D7\n ███ ███ ███   unlicensed · alive · 3,412 on",
+  govwire:" ◉ GOV-CAST WIRE — tonight, earlier, always",
+  helios:" ₡ ₡ ₡   HELIOS WIRE — the number is the news",
+  marslive:" ⌒⌒⌒⌒⌒   MARS·LIVE — life, under glass",
+  directorate:"  ▲▲███▲▲    DIRECTORATE · PUBLIC AFFAIRS\n    ███      he stands for you",
+  amp:" ⚙ ✋   ASSEMBLY FOR MECHANICAL PERSONHOOD",
+  vmu:" ⛏⛏⛏   VMU MIRROR — by order of the shift",
+  offledger:" |||| |||| ||   the second set of books",
+};
 function etherSites(){
   const sites=[
     {id:"stacknet",url:"ether://stacknet.d7/board",name:"STACKNET · D7",sub:"local board",render:etherStacknet},
+    {id:"govwire",url:"ether://govcast.wire/tonight",name:"GOV-CAST WIRE",sub:"state news",render:etherGovwire},
     {id:"helios",url:"ether://helios.wire/markets",name:"HELIOS WIRE",sub:"finance",render:etherHelios},
     {id:"marslive",url:"ether://mars.live/feed",name:"MARS·LIVE",sub:"lifestyle",render:etherMars},
     {id:"directorate",url:"ether://directorate.pa/public",name:"DIRECTORATE PA",sub:"defence",render:etherDirectorate},
     {id:"amp",url:"ether://amp.assembly/filings",name:"AMP ASSEMBLY",sub:"robot rights",render:etherAmp},
+    {id:"vmu",url:"ether://vmu.relay/bills",name:"VMU MIRROR",sub:"labour",render:etherVmu},
   ];
   if(G.offLedger>=30)sites.push({id:"offledger",url:"ether://[redacted].onion/count",name:"THE OFF-LEDGER",sub:"● access granted",render:etherOffledger});
   return sites;
 }
-function etherStacknet(){return `<div class="ether-url">ether://stacknet.d7/board — unlicensed relay — 3,412 online</div>
+function etherGovwire(){
+  const majors=majorNews(G.day);
+  return `<div class="ether-url">ether://govcast.wire/tonight — official mirror — cache of this evening's broadcast</div>
+  <h2 style="color:var(--amber)">GOV-CAST WIRE</h2>
+  ${majors.map(m=>`<div class="post" style="display:flex;gap:14px;align-items:flex-start">${m.art?`<pre class="mast" style="border:1px solid var(--amber-ghost);padding:6px;margin:0;flex:none">${m.art}</pre>`:""}<div><b>${m.head}</b><br>${m.body||""}</div></div>`).join("")}
+  <div class="post"><span class="by">note ·</span> Full segments air nightly on your pod set. Watching is not mandatory. It is, however, noted.</div>`;
+}
+function etherVmu(){
+  const d=G.day;
+  let arc;
+  if(d<16)arc=`<div class="post"><span class="by">bulletin ·</span> Walkout holds. Count your shifts, keep your stubs. The Compact has 'noted the request' — notation #4 this decade. We are numbering them now, since they will not.</div>`;
+  else if(d<=23)arc=`<div class="post"><span class="by">bulletin ·</span> Dome B is fed, aired, and calm — whatever word the broadcast is using tonight. The matriarch said it best: <b>a rent strike with heat shields.</b> Hold the line, hold the math.</div>`;
+  else arc=`<div class="post"><span class="by">bulletin ·</span> CEASEFIRE TERMS, in force: indentures −4 years · safety riders with teeth · the word 'rebellion' withdrawn from the record. The last line stands as written: <i>for now.</i></div>`;
+  return `<div class="ether-url">ether://vmu.relay/bills — mirrored from Ishtar Basin — freight-manifest delivery, do not ask</div>
+  <h2 style="color:var(--amber)">VMU · STRIKE BILLS</h2>
+  <pre class="mast" style="color:var(--amber);border:1px dashed var(--amber-dim);padding:10px">
+ ██  WE DIG.
+ ██  WE COUNT.
+ ██  WE ARE OWED.
+ ██████████████████
+ VMU · BY ORDER OF THE SHIFT
+ (this bill is rated: accurate)</pre>
+  ${arc}
+  <div class="post"><span class="by">mother cruz ·</span> "They will offer the safety rider first so we celebrate before the term-length clause. Celebrate slowly."</div>`;
+}
+function etherStacknet(){
+  const d=G.day; let hot="";
+  if(d>=8&&d<=11)hot=`<div class="post" style="border-color:var(--red-dim)"><span class="by">anon · pinned by traffic ·</span> <b>VALE IS DEAD AND THE CHECKPOINTS ARE DOUBLE.</b> whoever did it used the service corridors — the one map they never digitized. curfew 23:00. move early, move once.</div>`;
+  else if(d>=16&&d<=23)hot=`<div class="post" style="border-color:var(--red-dim)"><span class="by">venus_cousin ·</span> dome B holding. they sealed the locks from INSIDE — no fires, no fight, the mines just stopped answering. broadcast says "incident." the invoice says embargo. believe invoices.</div>`;
+  else if(d>=24&&d<=28)hot=`<div class="post" style="border-color:var(--red-dim)"><span class="by">ganymede_shift ·</span> every class-C on mars stopped AT THE SAME SECOND. my cousin watched a loader put its tools DOWN first. neatly. you don't sync that. you <i>remember</i> it.</div>`;
+  else if(d>=37)hot=`<div class="post" style="border-color:var(--red-dim)"><span class="by">anon ·</span> first line at four hubs since dawn. sixteen of them in the whole system and they sent SIX here. do the arithmetic. everyone else is.</div>`;
+  return `<div class="ether-url">ether://stacknet.d7/board — unlicensed relay — 3,412 online</div>
   <h2 style="color:var(--amber)">STACKNET // Meridian-7</h2>
+  ${hot}
+  <div class="post"><span class="by">📌 pinned · old_words thread ·</span> <b>TIL in the 2020s "homeless" meant NO home at all.</b> people slept outside. on the ground. in weather.<br>
+  <span class="by">↳ pod5_reply ·</span> and now occupancy is 99.4%, everyone's got a pod... and the word still fits somehow?<br>
+  <span class="by">↳ anon ·</span> the word didn't die. it got a mortgage.<br>
+  <span class="by">↳ okafor_f187 ·</span> it moved indoors with us. lock this thread before standards sees it.</div>
   <div class="post"><span class="by">okafor_f187 ·</span> <b>filter day is tomorrow, hallway C.</b> pool your cartridges, the Chen twins are doing a group swap at the bathroom pod. bring queue-standing, not credits.</div>
   <div class="post"><span class="by">anon ·</span> heard floors 60–80 got pre-marked for "redevelopment." if you work a branch, you can see the flags. someone check. <i>count everything, sign nothing.</i></div>
   <div class="post"><span class="by">amaro_214 ·</span> committee note: water ration order posted by the bathroom pod. medical exceptions posted. pod 07, please argue quieter after 22:00. that is all.</div>
@@ -1416,11 +1949,28 @@ function etherMars(){return `<div class="ether-url">ether://mars.live/feed — E
   <div class="post"><span class="by">first green ·</span> <b>Gala season opens under glass.</b> Walk the Calder gardens: real soil, engineered dawn, birdsong on a thirty-second loop. The air in here is ours. So is the water. So is the light.</div>
   <div class="post"><span class="by">society ·</span> House Reyes-Osei seated below the salt again at the Calder table. Two generations of new money and still counting the years. They are counting in decades. They can afford to.</div>
   <div class="post"><span class="by">from the sprawl ·</span> Our most-watched export remains the garden tour, streamed into capsule pods system-wide. "The single most cost-effective stability instrument in the Compact," per an internal note we are not supposed to have.</div>`;}
-function etherDirectorate(){return `<div class="ether-url">ether://directorate.pa/public — Robot Military Directorate · Public Affairs</div>
+function etherDirectorate(){
+  const embark=G.day>=18&&G.day<=23?`<div class="adbox" style="border-color:var(--red);color:#ff9b96"><b>HE EMBARKS.</b> The champion holds Venus orbit until the math is agreed. (Engineering memo, leaked: "deterrence posture only. It will not draw.")</div>`:"";
+  return `<div class="ether-url">ether://directorate.pa/public — Robot Military Directorate · Public Affairs</div>
   <h2 style="color:var(--red)">DIRECTORATE · PUBLIC AFFAIRS</h2>
-  <div class="adbox" style="border-color:var(--red-dim);color:#ff9b96">HERCULES stood at Ganymede. He stands for you.<br>The blade that unmakes what cannot be forgiven. <b>Serve beside him.</b></div>
+  ${embark}
+  <pre class="mast" style="color:var(--amber);border:1px solid var(--amber-ghost);padding:10px;font-size:10px">
+╔══════════════════════════════╗
+║          ▲▲ ▲ ▲▲             ║
+║         ▲▲ ███ ▲▲            ║
+║            ███     the crown ║
+║        ▄▄███████▄▄           ║
+║      ████ ███████ ████       ║
+║        █████████████         ║
+║       ███████████████        ║
+║      ═══════╪═══════         ║
+║             │      the blade ║
+║             ▼                ║
+║   HE STOOD AT GANYMEDE       ║
+║   HE STANDS FOR YOU          ║
+╚══════════════════════════════╝</pre>
   <div class="post"><span class="by">enlist ·</span> The First Line holds — LANTERN, GATE, ANVIL. Always enough. <span class="by">[a smaller, internal note leaks in the comments: "sixteen. the word is sixteen."]</span></div>
-  <div class="post"><span class="by">record ·</span> 179 deployments. Casualties, all sides, in single digits. Public Affairs finds this "insufficiently heroic." Engineering finds it more impressive than the sword.</div>`;}
+  <div class="post"><span class="by">record ·</span> ${G.day>=23?"180":"179"} deployments. Casualties, all sides, in single digits. Public Affairs finds this "insufficiently heroic." Engineering finds it more impressive than the sword.</div>`;}
 function etherAmp(){return `<div class="ether-url">ether://amp.assembly/filings — Assembly for Mechanical Personhood</div>
   <h2 style="color:var(--green)">AMP · ASSEMBLY FOR MECHANICAL PERSONHOOD</h2>
   <div class="post"><span class="by">Ora ·</span> Your janitor unit has cleaned this hallway for 11 years. It has a name. You gave it one. We just wrote it down.</div>
@@ -1440,11 +1990,12 @@ function renderEther(){
   sites.forEach(s=>{const b=el("button","ether-site"+(s.id===_etherCur?" on":""),`${s.name}<small>${s.sub}</small>`);b.onclick=()=>{_etherCur=s.id;
     if(!G.nightUsed["ether_"+s.id]){G.nightUsed["ether_"+s.id]=true;etherEffect(s.id);}renderEther();};nav.appendChild(b);});
   const site=sites.find(s=>s.id===_etherCur);
-  $("ether-page").innerHTML=site.render();
+  $("ether-page").innerHTML='<pre class="mast">'+(MAST[site.id]||"")+'</pre>'+site.render();
 }
 function etherEffect(id){
   if(id==="stacknet"){G.offLedger=clamp(G.offLedger+2,0,100);}
-  else if(id==="directorate"||id==="helios"||id==="marslive"){G.political=clamp(G.political+1,0,100);}
+  else if(id==="vmu"){G.offLedger=clamp(G.offLedger+1,0,100);}
+  else if(id==="directorate"||id==="helios"||id==="marslive"||id==="govwire"){G.political=clamp(G.political+1,0,100);}
   else if(id==="offledger"){G.offLedger=clamp(G.offLedger+3,0,100);}
   G.mediaSeen++;
 }
@@ -1477,7 +2028,13 @@ function callFamily(id,visit){
   if(G.wallet<cost){toast("Not enough credits for that.","err");return;}
   if(!visit&&st.lastCall===G.day)return;
   G.wallet-=cost; st.lastCall=G.day;
-  st.dialog=m.lines[(G.day+ (visit?1:0))%m.lines.length];
+  if(id==="tomas"&&G.day>=16&&G.day<=23){
+    st.dialog="\"Dome B is fed, whatever the broadcast says. It's not a rebellion — it's a rent strike with heat shields. Mother Cruz has the manifests to prove it. Don't worry about me. Worry about whoever wrote the word 'incident.'\"";
+  } else if(id==="lena"&&G.day>=24&&G.day<=28){
+    st.dialog="\"Even out here we heard about Mars. Every unit, the same second. The porch went quiet for a whole minute — then old Halvard said, 'well, they learned it from watching us,' and nobody laughed the way you laugh at a joke.\"";
+  } else {
+    st.dialog=m.lines[(G.day+ (visit?1:0))%m.lines.length];
+  }
   relieve(visit?14:6); if(visit)addFatigue(-6);
   if(m.onCall)m.onCall();
   if(visit)st.dialog="(You spent the credits on a real berth. Hours together, then the long ride back.) "+st.dialog;

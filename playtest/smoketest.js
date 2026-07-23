@@ -80,13 +80,16 @@ const path = require('path');
         if (btn) { btn.click(); return 'clockout'; }
         return 'idle';
       });
+    } else if (screen === 'scr-hallway') {
+      // skip the walk-home animation
+      await page.evaluate(() => { const b = document.getElementById('hall-enter'); if (b && b.onclick) b.click(); });
     } else if (screen === 'scr-pod') {
       await page.evaluate(() => { const o = document.querySelector('#pod-actions .opt'); if (o) o.click(); });
     } else if (screen === 'scr-summary') {
       await page.evaluate(() => { const b = document.getElementById('next-day'); if (b) b.click(); });
     } else {
-      // unknown; try any primary button
-      await page.evaluate(() => { const b = document.querySelector('.btn-primary'); if (b) b.click(); });
+      // unknown; try a primary button scoped to the ACTIVE screen only
+      await page.evaluate(() => { const b = document.querySelector('.screen.on .btn-primary'); if (b) b.click(); });
     }
     await page.waitForTimeout(8);
   }
