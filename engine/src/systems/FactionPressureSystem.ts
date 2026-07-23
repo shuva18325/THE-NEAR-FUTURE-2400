@@ -13,6 +13,8 @@ import {
   MEC_MONTHLY_BONUS,
   PENALTY_THRESHOLD,
   REFUSE_DELTA,
+  REFUSE_ESCALATION_CAP,
+  REFUSE_ESCALATION_STEP,
   REWARD_THRESHOLD,
   TEST_FAIL,
   TEST_MULT,
@@ -46,6 +48,8 @@ export class FactionPressureSystem {
   forcedDetainPending = false;
   framedCasesPending = 0;
   private lastMecBonusDay = 0;
+  /** consecutive refusals per faction — repeated refusal escalates the delta */
+  private refusalStreak: Record<FactionId, number>;
 
   constructor(
     private bus: EventBus,
@@ -53,6 +57,9 @@ export class FactionPressureSystem {
   ) {
     this.lastTestDay = Object.fromEntries(
       ALL_FACTIONS.map((f) => [f, -999]),
+    ) as Record<FactionId, number>;
+    this.refusalStreak = Object.fromEntries(
+      ALL_FACTIONS.map((f) => [f, 0]),
     ) as Record<FactionId, number>;
   }
 
@@ -77,12 +84,19 @@ export class FactionPressureSystem {
     let delta: number;
     if (c.isTestCase) {
       delta = complied ? COMPLY_DELTA * TEST_MULT : TEST_FAIL;
+      this.refusalStreak[f] = 0;
     } else if (complied) {
       delta = COMPLY_DELTA;
+      this.refusalStreak[f] = 0;
     } else if (d === Decision.ESCALATE) {
-      delta = ESCALATE_DELTA; // half-magnitude refusal
+      delta = ESCALATE_DELTA; // half-magnitude refusal; streak unchanged
     } else {
-      delta = REFUSE_DELTA;
+      // consecutive refusals escalate: -6, -8, -10, capped at -12
+      delta = Math.max(
+        REFUSE_ESCALATION_CAP,
+        REFUSE_DELTA - REFUSE_ESCALATION_STEP * this.refusalStreak[f],
+      );
+      this.refusalStreak[f]++;
     }
     this.apply(f, delta);
 
@@ -221,5 +235,10 @@ export class FactionPressureSystem {
   /** Checkpoint confiscation: the goods were COMBINE's — they notice. */
   onContrabandConfiscated(): void {
     this.apply(FactionId.COMBINE, -5);
+  }
+
+  /** A refused bribe goes in the officer's report. */
+  onFailedBribe(): void {
+    this.apply(FactionId.CEC, -5);
   }
 }

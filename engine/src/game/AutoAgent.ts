@@ -75,6 +75,17 @@ export class AutoAgent implements Agent {
     const fieldsPerDoc = quota <= 8 ? 99 : quota <= 11 ? 2 : 1;
     const shouldQuery = FINANCIAL_FAMILIES.has(c.family) || quota <= 11;
 
+    // 0. Free checksum hints (AUTO_CHECKSUM upgrade, if earned): flag & deny.
+    const hints = desk.autoChecksumHints();
+    if (hints.length > 0) {
+      for (const h of hints.slice(0, 2)) desk.fileFlag(h.docIndex, h.fieldIndex);
+      try {
+        return desk.stamp(Decision.DENY, true);
+      } catch {
+        /* fall through to normal processing if the gate rejects */
+      }
+    }
+
     // 1. Query the record when the family (or the pace) warrants it.
     if (shouldQuery) desk.queryDb();
 
@@ -147,5 +158,10 @@ export class AutoAgent implements Agent {
     if (this.getStress() > 55) return EveningChoice.REST;
     if (this.getWallet() < 100) return EveningChoice.SIDE_GIG;
     return EveningChoice.HALLWAY;
+  }
+
+  offerBribe(): boolean {
+    // only worth the risk when flush; a broke clerk takes the citation
+    return this.getWallet() > 150 && this.rng.chance(0.5);
   }
 }

@@ -2,7 +2,10 @@
 // SYSTEM_SKELETON.md §3.2 + §8.6.
 
 import {
+  APPEAL_FAIL_WEIGHT,
+  APPEAL_SUCCESS_P,
   AUDIT_LAG_DAYS,
+  CLEAN_STREAK_DAYS,
   GIG_REHIRE_DAYS,
   PERFORMANCE_PLAN_DAYS,
   THRESH_DEMOTION,
@@ -28,6 +31,8 @@ export class ErrorSystem {
   private auditQueue: PendingAudit[] = [];
   private tokens: ErrorToken[] = [];
   private lastThresholdFired = 0;
+  /** consecutive audit days with zero new errors — 5 removes the oldest token */
+  private cleanStreak = 0;
 
   constructor(
     private bus: EventBus,
@@ -104,7 +109,34 @@ export class ErrorSystem {
         immediate: false,
       });
     }
+
+    // clean-streak counterplay: 5 consecutive error-free audit days
+    // remove the oldest token (careful work digs you out, slowly)
+    if (due.length > 0) {
+      const anyErrorToday = notices.some((n) => n.kind === 'DISCREPANCY');
+      this.cleanStreak = anyErrorToday ? 0 : this.cleanStreak + 1;
+      if (this.cleanStreak >= CLEAN_STREAK_DAYS && this.tokens.length > 0) {
+        this.tokens.sort((x, y) => x.issuedDay - y.issuedDay).shift();
+        this.cleanStreak = 0;
+        notices.push({ kind: 'CLEAN_RECORD', text: '5 clean audit days: oldest token removed' });
+      }
+    }
     return notices;
+  }
+
+  /**
+   * APPEAL: formally contest the oldest token (a UI-facing counterplay,
+   * one attempt per token). Success removes it; failure adds one more —
+   * appeals are a gamble, not a refund desk.
+   */
+  appealOldest(rng: { chance(p: number): boolean }, today: number): 'UPHELD' | 'REJECTED' | 'NO_TOKENS' {
+    if (this.tokens.length === 0) return 'NO_TOKENS';
+    if (rng.chance(APPEAL_SUCCESS_P)) {
+      this.tokens.sort((x, y) => x.issuedDay - y.issuedDay).shift();
+      return 'UPHELD';
+    }
+    this.addToken('APPEAL', today, APPEAL_FAIL_WEIGHT);
+    return 'REJECTED';
   }
 
   /** DAY_END step 2: expire old tokens. */

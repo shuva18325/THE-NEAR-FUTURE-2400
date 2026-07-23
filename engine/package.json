@@ -8,7 +8,7 @@
     "build": "tsc",
     "sim": "node dist/main.js",
     "sim:seed": "node dist/main.js --seed",
-    "test": "node dist/test/determinism.test.js"
+    "test": "node dist/test/determinism.test.js && node dist/test/expansion.test.js"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",

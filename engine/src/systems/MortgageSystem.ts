@@ -1,11 +1,16 @@
 // MortgageSystem — the player's own stage 0-4 delinquency ladder.
 // SYSTEM_SKELETON.md §3.2 + §8.3.
 
-import { MORTGAGE_PAYMENT, MORTGAGE_PERIOD_DAYS } from '../constants';
+import { ESCROW_GRACE_FRACTION, MORTGAGE_PAYMENT, MORTGAGE_PERIOD_DAYS } from '../constants';
 import { EventBus, GameEventType } from '../events/EventBus';
 import { PlayerStateSystem } from './PlayerStateSystem';
 
 export class MortgageSystem {
+  /** partial payments accumulate here between due dates */
+  private escrow = 0;
+  /** unpaid remainder carried into the next payment */
+  private carryover = 0;
+
   constructor(
     private bus: EventBus,
     private players: PlayerStateSystem,
@@ -16,14 +21,33 @@ export class MortgageSystem {
     let due = MORTGAGE_PAYMENT;
     if (m.stage >= 2) due *= 1.15; // penalty interest
     if (m.restructured) due *= 1.05; // stage-3 permanent bump
-    return Math.round(due);
+    return Math.round(due) + this.carryover;
+  }
+
+  escrowBalance(): number {
+    return this.escrow;
+  }
+
+  /**
+   * Partial payment counterplay: move wallet money into escrow ahead of the
+   * due date. If escrow covers >= 50% of the payment when it lands, the
+   * stage ladder does NOT advance — the remainder carries over instead.
+   */
+  payPartial(amount: number): boolean {
+    if (amount <= 0) return false;
+    if (!this.players.spend(amount, 'mortgage-escrow')) return false;
+    this.escrow += amount;
+    return true;
   }
 
   /** Pay early from the pod screen. Returns success. */
   payNow(): boolean {
     const m = this.players.player.mortgage;
     const due = this.paymentDue();
-    if (!this.players.spend(due, 'mortgage-early')) return false;
+    const fromEscrow = Math.min(this.escrow, due);
+    if (!this.players.spend(due - fromEscrow, 'mortgage-early')) return false;
+    this.escrow -= fromEscrow;
+    this.carryover = 0;
     m.amount = Math.max(0, m.amount - due);
     m.missedStreak = 0;
     if (m.stage > 0 && m.stage < 3) m.stage = 0; // arrears cleared below stage 3
@@ -31,17 +55,33 @@ export class MortgageSystem {
     return true;
   }
 
-  /** Day-end check (DAY_END_UPDATE step 4). */
+  /** Day-end check (DAY_END_UPDATE step 4). Escrow drains first, wallet second. */
   dailyCheck(dayIndex: number): void {
     const m = this.players.player.mortgage;
     if (dayIndex !== m.dueDate) return;
 
     const due = this.paymentDue();
-    if (this.players.spend(due, 'mortgage')) {
+    const fromEscrow = Math.min(this.escrow, due);
+    const remainder = due - fromEscrow;
+
+    if (remainder === 0 || this.players.spend(remainder, 'mortgage')) {
+      // fully covered
+      this.escrow -= fromEscrow;
+      this.carryover = 0;
       m.amount = Math.max(0, m.amount - due);
       m.missedStreak = 0;
       if (m.stage > 0 && m.stage < 3) m.stage = 0;
+    } else if (fromEscrow >= due * ESCROW_GRACE_FRACTION) {
+      // escrow grace: >=50% pre-paid — no stage advance, remainder carries
+      this.escrow = 0;
+      this.carryover = remainder;
+      m.amount = Math.max(0, m.amount - fromEscrow);
+      this.bus.publish(GameEventType.MORTGAGE_STAGE, { stage: m.stage, grace: true });
     } else {
+      // missed — escrow (if any) still applies to principal, ladder advances
+      this.escrow = 0;
+      this.carryover = 0;
+      m.amount = Math.max(0, m.amount - fromEscrow);
       m.missedStreak++;
       this.advanceStage();
     }

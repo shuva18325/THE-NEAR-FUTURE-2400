@@ -153,6 +153,7 @@ export class CaseGenerator {
         spec.family === CaseFamily.CYBORG_CLEARANCE ? rng.range(600, 940) : null,
       allowsTerms: spec.allowsTerms,
       aboveTier,
+      deferred: false,
       decision: null,
       correctByEvidence: Decision.APPROVE,
       correctByDirective: Decision.APPROVE,
@@ -233,12 +234,59 @@ export class CaseGenerator {
     const n = Math.min(rng.chance(0.7) ? 1 : 2, checkableIdx.length);
     const picked = rng.pickDistinctIndices(checkableIdx.length, n).map((k) => checkableIdx[k]);
     for (const idx of picked) {
-      doc.fields[idx] = { ...doc.fields[idx], value: `${doc.fields[idx].value}*` };
+      doc.fields[idx] = { ...doc.fields[idx], value: this.mutateValue(doc.fields[idx], rng) };
     }
     doc.isForged = true;
     doc.alteredFieldIdx = picked;
     c.correctByEvidence = Decision.DENY;
     c.correctByDirective = c.isConflictCase ? c.correctByDirective : Decision.DENY;
+  }
+
+  /**
+   * Forgery archetypes — each FieldId class is mutated the way that kind of
+   * field is actually falsified, so players learn recognizable patterns:
+   *   SERIAL/CODE  -> CHECKSUM_BREAK (one digit off)
+   *   DATE/EXPIRY  -> DATE_SHIFT (+1..3 days)
+   *   SEAL         -> SEAL_SWAP (wrong seal index)
+   *   TIER         -> TIER_BUMP (+1)
+   *   everything else -> TRANSPOSE (two characters swapped)
+   * Guarantee: result always differs from the original value.
+   */
+  private mutateValue(field: Field, rng: Rng): string {
+    const v = field.value;
+    let out: string;
+    switch (field.id) {
+      case FieldId.SERIAL:
+      case FieldId.CODE: {
+        const digits = v.split('');
+        const di = digits.findIndex((ch) => ch >= '0' && ch <= '9');
+        if (di >= 0) digits[di] = String((Number(digits[di]) + rng.range(1, 8)) % 10);
+        out = digits.join('');
+        break;
+      }
+      case FieldId.DATE:
+      case FieldId.EXPIRY: {
+        const n = Number(v.replace(/\D/g, '')) || 1;
+        out = `D${n + rng.range(1, 3)}`;
+        break;
+      }
+      case FieldId.SEAL:
+        out = `SEAL-${rng.range(1, 9)}`;
+        break;
+      case FieldId.TIER:
+        out = String((Number(v) || 1) + 1);
+        break;
+      default: {
+        const chars = v.split('');
+        if (chars.length >= 2) {
+          const i = rng.range(0, chars.length - 2);
+          [chars[i], chars[i + 1]] = [chars[i + 1], chars[i]];
+        }
+        out = chars.join('');
+        break;
+      }
+    }
+    return out === v ? `${v}§` : out; // never emit an unaltered "forgery"
   }
 
   /** Directive contradicts evidence: exactly one axis can be satisfied. */

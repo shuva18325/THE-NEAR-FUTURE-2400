@@ -26,4 +26,10 @@ export interface Agent {
   takeOvertime(behindBy: number): boolean;
   /** POD_EVENTS. */
   chooseEvening(): EveningChoice;
+  /**
+   * CHECKPOINT secondary: offer a bribe? Called only when the scan has
+   * already failed (lapsed permit or contraband found). Cost and odds are
+   * the CheckpointSystem's business; the agent only decides yes/no.
+   */
+  offerBribe(): boolean;
 }

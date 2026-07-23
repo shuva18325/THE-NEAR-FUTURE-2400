@@ -11,6 +11,9 @@ import {
   METER_MAX,
   METER_MIN,
   STRESS_FALSE_HIGHLIGHT_AT,
+  STRESS_FLOOR_CLEAR_DAYS,
+  STRESS_FLOOR_TRIGGER_DAYS,
+  STRESS_FLOOR_VALUE,
   STRESS_STAMP_DRIFT_AT,
   clamp,
 } from '../constants';
@@ -29,6 +32,10 @@ export class StressSystem {
   private incidentDays: number[] = [];
   private breakdownFiredToday = false;
   private collapseFiredToday = false;
+  /** chronic stress: 3 days ending >=70 raises the floor; 2 days <=40 clears it */
+  private highStressDays = 0;
+  private lowStressDays = 0;
+  private stressFloor = 0;
 
   constructor(
     private bus: EventBus,
@@ -58,7 +65,8 @@ export class StressSystem {
 
   relieveStress(amount: number): void {
     if (amount < 0) throw new Error('relieveStress: negative amount');
-    this.player.stress = clamp(this.player.stress - amount, METER_MIN, METER_MAX);
+    // relief can never dig below the chronic floor
+    this.player.stress = clamp(this.player.stress - amount, this.stressFloor, METER_MAX);
   }
 
   /** Applied by GameLoop after BREAKDOWN handling: shift ends, meters reset. */
@@ -80,6 +88,20 @@ export class StressSystem {
 
   /** Overnight recovery — quality 0 => -30/-10, quality 100 => -80/-35. */
   overnightRecovery(sleepQuality: number): void {
+    // chronic stress tracking uses the level the day ENDED at
+    if (this.player.stress >= 70) {
+      this.highStressDays++;
+      this.lowStressDays = 0;
+    } else if (this.player.stress <= 40) {
+      this.lowStressDays++;
+      this.highStressDays = 0;
+    } else {
+      this.highStressDays = 0;
+      this.lowStressDays = 0;
+    }
+    if (this.highStressDays >= STRESS_FLOOR_TRIGGER_DAYS) this.stressFloor = STRESS_FLOOR_VALUE;
+    if (this.lowStressDays >= STRESS_FLOOR_CLEAR_DAYS) this.stressFloor = 0;
+
     let fatigueRecovery = 30 + sleepQuality / 2;
     if (this.player.fatigueRecoveryBonusDays > 0) {
       fatigueRecovery *= 1.2; // SMC reward
@@ -89,10 +111,14 @@ export class StressSystem {
       clamp(this.player.fatigue - fatigueRecovery, METER_MIN, METER_MAX),
     );
     this.player.stress = Math.round(
-      clamp(this.player.stress - (10 + sleepQuality / 4), METER_MIN, METER_MAX),
+      clamp(this.player.stress - (10 + sleepQuality / 4), this.stressFloor, METER_MAX),
     );
     this.breakdownFiredToday = false;
     this.collapseFiredToday = false;
+  }
+
+  currentStressFloor(): number {
+    return this.stressFloor;
   }
 
   activeDebuffs(): Debuff[] {

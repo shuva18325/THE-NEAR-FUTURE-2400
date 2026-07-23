@@ -2,6 +2,10 @@
 // SYSTEM_SKELETON.md §6.4 + §8.4.
 
 import {
+  BRIBE_BASE_P,
+  BRIBE_CEC_BONUS_P,
+  BRIBE_COST,
+  BRIBE_FAIL_DETAIN_BONUS,
   CHECKPOINT_FINE,
   DETAIN_BASE_P,
   DETAIN_CEC_HOSTILE_P,
@@ -33,7 +37,12 @@ export class CheckpointSystem {
     private errors: ErrorSystem,
   ) {}
 
-  resolve(e: CheckpointEvent, ctx: DayContext, rng: Rng): CheckpointOutcome {
+  resolve(
+    e: CheckpointEvent,
+    ctx: DayContext,
+    rng: Rng,
+    shouldBribe: () => boolean = () => false,
+  ): CheckpointOutcome {
     const p = this.players.player;
     const permitOk = this.permits.validate(e.requiredPermit);
     const contraband = e.robotScan && p.carryingContraband;
@@ -48,6 +57,28 @@ export class CheckpointSystem {
       if (this.factions.rep(FactionId.CEC) <= -60) detainP += DETAIN_CEC_HOSTILE_P;
       if (this.errors.tokenCount() >= THRESH_PROBATION) detainP += DETAIN_FLAGGED_WORKER_P;
       if (this.factions.rep(FactionId.CEC) >= 0) detainP /= 2;
+
+      // BRIBE counterplay: money up front, before the detain roll.
+      // Success walks you through; failure costs the bribe, deepens CEC
+      // hostility, and raises the detain odds for THIS stop.
+      if (shouldBribe() && this.players.spend(BRIBE_COST, 'checkpoint-bribe')) {
+        let bribeP = BRIBE_BASE_P;
+        if (this.factions.rep(FactionId.CEC) >= 0) bribeP += BRIBE_CEC_BONUS_P;
+        if (rng.chance(bribeP)) {
+          const bribed: CheckpointOutcome = {
+            result: CheckpointResult.PASS,
+            timeCost: e.baseTimeCost,
+            fine: BRIBE_COST,
+          };
+          ctx.clock += bribed.timeCost;
+          this.stress.addStress(5, 'checkpoint-bribe', ctx.dayIndex);
+          ctx.checkpointOutcomes.push(bribed);
+          this.bus.publish(GameEventType.CHECKPOINT_RESULT, { result: bribed.result, bribed: true });
+          return bribed;
+        }
+        this.factions.onFailedBribe();
+        detainP += BRIBE_FAIL_DETAIN_BONUS;
+      }
 
       if (rng.chance(detainP)) {
         ctx.halfDayDetained = true;

@@ -3,10 +3,12 @@
 // SYSTEM_SKELETON.md §5.
 
 import {
+  DEFER_SLOTS_PER_DAY,
   ESCALATION_SLOTS_BASE,
   ROBOT_AUDIT_UNIT_ACCURACY,
   SPOT_AUDIT_BASE_P,
   T_COMPARE,
+  T_DEFER,
   T_FLAG,
   T_PULL,
   T_QUERY,
@@ -24,6 +26,7 @@ import {
   DayContext,
   Decision,
   DeskUpgrade,
+  FieldId,
 } from '../types';
 import { DocumentCheckSystem, CompareResult } from './DocumentCheckSystem';
 import { ErrorSystem } from './ErrorSystem';
@@ -37,6 +40,7 @@ export class WorkDeskSystem {
   private queue: Case[] = [];
   openCase: Case | null = null;
   escalationsLeft = ESCALATION_SLOTS_BASE;
+  deferSlotsLeft = DEFER_SLOTS_PER_DAY;
   private falseHighlightUsedThisCase = false;
   private rng!: Rng;
   private ctx!: DayContext;
@@ -62,6 +66,7 @@ export class WorkDeskSystem {
     if (this.players.supervisorStandingLow()) {
       this.escalationsLeft = Math.min(this.escalationsLeft, 2);
     }
+    this.deferSlotsLeft = DEFER_SLOTS_PER_DAY;
   }
 
   queueDepth(): number {
@@ -87,6 +92,45 @@ export class WorkDeskSystem {
       if (this.factions.assistantActive()) this.advanceClock(-T_COMPARE);
     }
     return c;
+  }
+
+  /**
+   * DEFER: push the open case to the back of the queue (costs a slot + time).
+   * Counterplay for a bad moment: an expiring clearance code you can't verify
+   * in time, or a tagged case you want to decide after lunch. Each case can
+   * be deferred once; 2 slots per day. Returns false if not allowed.
+   */
+  defer(): boolean {
+    const c = this.mustOpen();
+    if (this.deferSlotsLeft <= 0 || c.deferred) return false;
+    this.deferSlotsLeft--;
+    c.deferred = true;
+    this.queue.push(c);
+    this.openCase = null;
+    this.advanceClock(T_DEFER);
+    return true;
+  }
+
+  /**
+   * AUTO_CHECKSUM upgrade: the desk device validates internal checksums on
+   * SERIAL/CODE fields the moment a case is pulled — it detects
+   * checksum-breaking forgeries only (other archetypes pass silently),
+   * costs no time, and never false-positives.
+   */
+  autoChecksumHints(): { docIndex: number; fieldIndex: number }[] {
+    const c = this.mustOpen();
+    if (!this.players.hasUpgrade(DeskUpgrade.AUTO_CHECKSUM)) return [];
+    const hints: { docIndex: number; fieldIndex: number }[] = [];
+    c.documents.forEach((doc, di) => {
+      if (!doc.isForged) return;
+      for (const fi of doc.alteredFieldIdx) {
+        const id = doc.fields[fi].id;
+        if (id === FieldId.SERIAL || id === FieldId.CODE) {
+          hints.push({ docIndex: di, fieldIndex: fi });
+        }
+      }
+    });
+    return hints;
   }
 
   /** QUERY the records database. */

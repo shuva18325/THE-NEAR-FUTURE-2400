@@ -100,6 +100,24 @@ export const T_STAMP = 2;
 export const SPOT_AUDIT_BASE_P = 0.1;
 export const ROBOT_AUDIT_UNIT_ACCURACY = 0.85;
 
+// ---- expansion layer (MECHANICS_EXPANSION_AND_ART_SYSTEMS.md) ----
+export const DEFER_SLOTS_PER_DAY = 2; // push a case back in the queue
+export const T_DEFER = 4;
+export const HALF_QUOTA_BONUS = 22; // grace band: quota-1 pays half bonus
+export const CLEAN_STREAK_DAYS = 5; // 5 clean audit days remove oldest token
+export const APPEAL_SUCCESS_P = 0.55; // contesting a token
+export const APPEAL_FAIL_WEIGHT = 1; // failed appeal adds one token
+export const BRIBE_COST = 40;
+export const BRIBE_BASE_P = 0.7;
+export const BRIBE_CEC_BONUS_P = 0.15; // when CEC rep >= 0
+export const BRIBE_FAIL_DETAIN_BONUS = 0.15;
+export const REFUSE_ESCALATION_STEP = 2; // each consecutive refusal deepens delta
+export const REFUSE_ESCALATION_CAP = -12;
+export const STRESS_FLOOR_TRIGGER_DAYS = 3; // days ending >= 70 stress
+export const STRESS_FLOOR_VALUE = 10; // chronic floor
+export const STRESS_FLOOR_CLEAR_DAYS = 2; // days ending <= 40 to clear
+export const ESCROW_GRACE_FRACTION = 0.5; // >=50% escrowed => stage does not advance
+
 export function actOfDay(day: number): 1 | 2 | 3 {
   if (day >= ACT3_START_DAY) return 3;
   if (day >= ACT2_START_DAY) return 2;

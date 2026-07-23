@@ -206,6 +206,7 @@ export interface Case {
   codeExpiryClock: number | null; // cyborg cases only
   allowsTerms: boolean;
   aboveTier: boolean; // robot caste case above player's licensed tier
+  deferred: boolean; // a case may be deferred to the back of the queue once
   // resolution
   decision: Decision | null;
   // generation-time truth

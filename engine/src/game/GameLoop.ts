@@ -7,6 +7,7 @@ import {
   FILTER_COST,
   FILTER_DECAY_PER_DAY,
   GIG_WAGE,
+  HALF_QUOTA_BONUS,
   LATE_DOCK,
   LUNCH_LEN,
   LUNCH_START,
@@ -218,7 +219,7 @@ export class GameLoop {
     if (result.pendingCheckpoint) {
       this.transition(GameState.CHECKPOINT);
       const cpRng = this.rngMgr.stream(this.ctx.dayIndex, RngStream.CHECKPOINT, phase === TripPhase.OUTBOUND ? 0 : 1);
-      this.checkpoint.resolve(result.pendingCheckpoint, this.ctx, cpRng);
+      this.checkpoint.resolve(result.pendingCheckpoint, this.ctx, cpRng, () => this.agent.offerBribe());
       this.transition(phase === TripPhase.OUTBOUND ? GameState.COMMUTE : GameState.COMMUTE_BACK);
     }
     if (phase === TripPhase.OUTBOUND) {
@@ -390,6 +391,7 @@ export class GameLoop {
       wages = this.desk.wagesForToday();
       const perf = p.dailyPerformance;
       if (perf.casesClosed >= perf.quotaTarget) wages += QUOTA_BONUS;
+      else if (perf.casesClosed === perf.quotaTarget - 1) wages += HALF_QUOTA_BONUS; // grace band
       if (perf.lateMinutes > 0) wages -= LATE_DOCK;
       if (ctx.shiftLog.overtimeTaken) {
         /* overtime cases already paid per-case */
