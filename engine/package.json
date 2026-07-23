@@ -1,0 +1,17 @@
+{
+  "name": "near-future-2400-engine",
+  "version": "0.1.0",
+  "description": "Engine implementation of SYSTEM_SKELETON.md for THE NEAR FUTURE: 2400. Pure TypeScript game logic + headless simulation harness. UI-agnostic (Svelte bindable via EventBus).",
+  "private": true,
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "sim": "node dist/main.js",
+    "sim:seed": "node dist/main.js --seed",
+    "test": "node dist/test/determinism.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^5.5.0"
+  }
+}
