@@ -14,4 +14,6 @@ See [`MECHANICS_EXPANSION_AND_ART_SYSTEMS.md`](./MECHANICS_EXPANSION_AND_ART_SYS
 
 See [`FINAL_WORLD_INTEGRATION_AND_LORE.md`](./FINAL_WORLD_INTEGRATION_AND_LORE.md) for the **final layer**: the complete 20-component Mega-AI registry, full Dyson sphere history, slum and Mars culture, 11 GOI write-ups in the two-register (public/internal) format, world-state maps and layouts, ASCII propaganda posters, the engine-event-to-in-world-document skin map, and the concrete ending conditions and math for all eight endings.
 
-**Document stack (bottom to top):** GDD → Mechanics → System Skeleton → `engine/` (runnable) → Expansion & Art → World Integration & Lore.
+See [`playtest/`](./playtest/) for a **playable single-file browser slice** — the core adjudication loop, meters, commute, mortgage, factions, and all eight endings, self-contained with no build step. Open `playtest/index.html` in a browser to play.
+
+**Document stack (bottom to top):** GDD → Mechanics → System Skeleton → `engine/` (runnable) → Expansion & Art → World Integration & Lore → `playtest/` (playable).

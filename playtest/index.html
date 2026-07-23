@@ -1,0 +1,1134 @@
+<title>THE NEAR FUTURE: 2400 — Adjudication Terminal</title>
+<style>
+  :root{
+    --ground:#0a0b0d; --ground2:#0d0f12; --panel:#14161b; --panel2:#191c22;
+    --line:#2a2e37; --line-hot:#3a3f4b;
+    --amber:#eb9b34; --amber-bright:#ffbe5c; --amber-dim:#9a7440; --amber-ghost:#5a4526;
+    --cyan:#4ec6d0; --cyan-dim:#2f7f86;
+    --red:#e5544e; --red-dim:#7d2f2c;
+    --green:#4fb85a; --green-dim:#2c6a33;
+    --ink:#dcd6c8; --ink-dim:#8a8578; --ink-ghost:#57544c;
+    --mono:ui-monospace,"SF Mono","Cascadia Code","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif;
+    --r:3px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:
+      radial-gradient(120% 90% at 50% -10%, #16130c 0%, var(--ground) 55%, #060708 100%);
+    color:var(--ink); font-family:var(--mono); font-size:14px; line-height:1.5;
+    -webkit-font-smoothing:antialiased; overflow:hidden;
+  }
+  /* CRT ambiance overlay */
+  #crt{position:fixed; inset:0; pointer-events:none; z-index:9999;
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0) 0 2px, rgba(0,0,0,.18) 2px 3px);
+    mix-blend-mode:multiply; opacity:.5;}
+  #vignette{position:fixed; inset:0; pointer-events:none; z-index:9998;
+    box-shadow:inset 0 0 220px 40px rgba(0,0,0,.85);}
+  @media (prefers-reduced-motion:no-preference){
+    #crt{animation:flick 5.5s steps(60) infinite}
+    @keyframes flick{0%,97%,100%{opacity:.5} 98%{opacity:.36} 99%{opacity:.55}}
+    .glow{text-shadow:0 0 8px rgba(235,155,52,.35)}
+  }
+  .wrap{position:relative; z-index:1; height:100%; display:flex; flex-direction:column;
+    max-width:1180px; margin:0 auto; padding:10px 14px 12px;}
+
+  /* ---------- HUD ---------- */
+  .hud{display:flex; align-items:stretch; gap:10px; flex-wrap:wrap;
+    border:1px solid var(--line); background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border-radius:var(--r); padding:8px 12px; margin-bottom:10px;}
+  .hud .brand{display:flex; flex-direction:column; justify-content:center; padding-right:14px;
+    border-right:1px solid var(--line); min-width:150px;}
+  .hud .brand b{color:var(--amber); letter-spacing:.14em; font-size:12px}
+  .hud .brand span{color:var(--ink-ghost); font-size:10px; letter-spacing:.22em}
+  .meters{display:flex; gap:16px; flex:1; flex-wrap:wrap; align-items:center}
+  .meter{min-width:96px}
+  .meter .lab{font-size:9.5px; letter-spacing:.18em; color:var(--ink-dim); display:flex; justify-content:space-between}
+  .meter .lab b{color:var(--ink); font-variant-numeric:tabular-nums; letter-spacing:normal}
+  .bar{height:7px; margin-top:3px; background:#000; border:1px solid var(--line); border-radius:2px; overflow:hidden; position:relative}
+  .bar > i{display:block; height:100%; width:0; transition:width .35s ease}
+  .bar.stress > i{background:linear-gradient(90deg,var(--amber-dim),var(--amber))}
+  .bar.stress.warn > i{background:linear-gradient(90deg,var(--amber),var(--red))}
+  .bar.fatigue > i{background:linear-gradient(90deg,var(--cyan-dim),var(--cyan))}
+  .bar.tok > i{background:linear-gradient(90deg,var(--red-dim),var(--red))}
+  .chip{font-size:11px; padding:2px 8px; border:1px solid var(--line); border-radius:2px;
+    color:var(--ink); font-variant-numeric:tabular-nums; display:flex; align-items:center; gap:6px; white-space:nowrap}
+  .chip small{color:var(--ink-dim); font-size:9px; letter-spacing:.16em}
+  .chip b{color:var(--amber)}
+
+  /* ---------- viewport ---------- */
+  .view{flex:1; min-height:0; border:1px solid var(--line);
+    background:linear-gradient(180deg,var(--ground2),var(--panel));
+    border-radius:var(--r); overflow:hidden; position:relative; display:flex; flex-direction:column}
+  .screen{display:none; flex:1; min-height:0; flex-direction:column}
+  .screen.on{display:flex}
+  .scroll{overflow:auto; padding:16px 18px}
+
+  h1,h2,h3{margin:0; font-weight:600; text-wrap:balance}
+  .eyebrow{font-size:10px; letter-spacing:.34em; color:var(--amber-dim); text-transform:uppercase}
+  .prose{font-family:var(--sans); color:var(--ink); max-width:60ch; line-height:1.62}
+  .prose.dim{color:var(--ink-dim)}
+  .muted{color:var(--ink-dim)} .ghost{color:var(--ink-ghost)}
+  .amber{color:var(--amber)} .cy{color:var(--cyan)} .rd{color:var(--red)} .gn{color:var(--green)}
+  .tnum{font-variant-numeric:tabular-nums}
+
+  /* ---------- buttons ---------- */
+  button{font-family:var(--mono); cursor:pointer; color:var(--ink);
+    background:var(--panel2); border:1px solid var(--line-hot); border-radius:var(--r);
+    padding:9px 14px; font-size:12.5px; letter-spacing:.06em; transition:.12s;}
+  button:hover:not(:disabled){border-color:var(--amber-dim); color:var(--amber-bright); background:#20242c}
+  button:disabled{opacity:.32; cursor:not-allowed}
+  button:focus-visible{outline:2px solid var(--amber); outline-offset:2px}
+  .btn-primary{background:linear-gradient(180deg,#3a2c14,#241a0c); border-color:var(--amber-dim); color:var(--amber-bright)}
+  .btn-primary:hover:not(:disabled){background:linear-gradient(180deg,#4a3717,#2c200d); border-color:var(--amber)}
+  .btn-danger{border-color:var(--red-dim)} .btn-danger:hover:not(:disabled){border-color:var(--red); color:#ff8b86; background:#241213}
+  .btn-row{display:flex; gap:8px; flex-wrap:wrap}
+  .stamp{position:relative; overflow:hidden}
+  .stamp .fill{position:absolute; inset:0; background:rgba(235,155,52,.22); width:0; pointer-events:none}
+  .stamp.ready{border-color:var(--green-dim)}
+
+  /* ---------- desk ---------- */
+  .desk{flex:1; min-height:0; display:grid; grid-template-columns:200px 1fr 236px; gap:0}
+  .col{min-height:0; display:flex; flex-direction:column; overflow:hidden}
+  .col + .col{border-left:1px solid var(--line)}
+  .col h3{font-size:10px; letter-spacing:.2em; color:var(--ink-dim); padding:9px 12px; border-bottom:1px solid var(--line); text-transform:uppercase; display:flex; justify-content:space-between}
+  .col .body{overflow:auto; padding:10px 12px; flex:1}
+
+  .qitem{border:1px solid var(--line); border-radius:2px; padding:7px 9px; margin-bottom:7px; font-size:11px; cursor:default}
+  .qitem.active{border-color:var(--amber-dim); background:#20180b}
+  .qitem .fam{color:var(--ink); letter-spacing:.02em}
+  .qitem .sub{color:var(--ink-ghost); font-size:9.5px; margin-top:2px; display:flex; gap:6px; flex-wrap:wrap}
+  .tag{font-size:9px; padding:1px 5px; border-radius:2px; border:1px solid currentColor; letter-spacing:.1em}
+  .tag.fac{color:var(--amber)} .tag.exp{color:var(--red)} .tag.tier{color:var(--red)}
+  .tag.frag{color:var(--cyan)} .tag.dbl{color:var(--red-dim)}
+
+  .doc{border:1px solid var(--line); border-radius:2px; margin-bottom:10px; background:var(--ground2)}
+  .doc.record{border-color:var(--cyan-dim); background:#0a1315}
+  .doc .dh{font-size:10px; letter-spacing:.14em; padding:6px 10px; border-bottom:1px solid var(--line); color:var(--amber-dim); display:flex; justify-content:space-between}
+  .doc.record .dh{color:var(--cyan)}
+  .field{display:flex; align-items:center; gap:8px; padding:5px 10px; font-size:12px; border-top:1px solid #1c1f26}
+  .field:first-of-type{border-top:0}
+  .field .fid{width:74px; color:var(--ink-dim); font-size:10px; letter-spacing:.08em; flex:none}
+  .field .fval{flex:1; color:var(--ink); font-variant-numeric:tabular-nums; word-break:break-all}
+  .field .st{width:18px; text-align:center; flex:none; font-size:12px}
+  .field.clickable{cursor:pointer} .field.clickable:hover{background:#1a1d24}
+  .field.match .fval{color:var(--green)} .field.mismatch .fval{color:var(--red)}
+  .field.flagged{background:#231014}
+  .field .flagbtn{font-size:9px; padding:2px 6px; border-radius:2px; background:transparent; border:1px solid var(--line-hot)}
+
+  .directive{font-size:11px; border:1px solid var(--line); border-radius:2px; padding:8px 10px; margin-bottom:10px; background:var(--ground2)}
+  .directive b{color:var(--amber); display:block; font-size:9px; letter-spacing:.2em; margin-bottom:5px}
+  .directive .rule{color:var(--ink-dim); margin:3px 0; padding-left:10px; text-indent:-10px}
+  .directive.conflict{border-color:var(--red-dim)}
+
+  .deskfoot{border-top:1px solid var(--line); padding:9px 12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:var(--panel)}
+  .deskfoot .clock{font-size:12px; color:var(--ink-dim); letter-spacing:.08em}
+  .deskfoot .clock b{color:var(--amber); font-variant-numeric:tabular-nums}
+  .spacer{flex:1}
+
+  /* generic panels for commute/pod/summary */
+  .card{border:1px solid var(--line); border-radius:var(--r); background:var(--ground2); padding:14px 16px}
+  .card + .card{margin-top:12px}
+  .opt{display:flex; align-items:center; gap:12px; border:1px solid var(--line); border-radius:2px; padding:11px 14px; margin-bottom:9px; cursor:pointer; transition:.12s}
+  .opt:hover{border-color:var(--amber-dim); background:#1a1610}
+  .opt .rt{flex:1}
+  .opt .rt b{color:var(--ink)} .opt .rt .d{font-size:10.5px; color:var(--ink-dim); margin-top:2px}
+  .opt .risk{font-size:10px; letter-spacing:.1em}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .kv{display:flex; justify-content:space-between; font-size:12px; padding:3px 0; border-bottom:1px dotted #23262e}
+  .kv .k{color:var(--ink-dim)} .kv .v{color:var(--ink); font-variant-numeric:tabular-nums}
+  table.fac{width:100%; border-collapse:collapse; font-size:11.5px}
+  table.fac td{padding:4px 6px; border-bottom:1px solid #1c1f26; font-variant-numeric:tabular-nums}
+  table.fac .fbar{height:6px; background:#000; border:1px solid var(--line); position:relative; border-radius:2px}
+  table.fac .fbar i{position:absolute; top:0; bottom:0; background:var(--amber)}
+  table.fac .fbar .mid{position:absolute; left:50%; top:-1px; bottom:-1px; width:1px; background:var(--line-hot)}
+
+  .toast-wrap{position:absolute; top:10px; right:12px; z-index:50; display:flex; flex-direction:column; gap:6px; max-width:320px}
+  .toast{border:1px solid var(--line-hot); background:#1b1e25; border-radius:2px; padding:8px 11px; font-size:11px; animation:slidein .2s}
+  .toast.err{border-color:var(--red-dim); background:#231114} .toast.good{border-color:var(--green-dim); background:#0f1c12}
+  @keyframes slidein{from{opacity:0; transform:translateX(12px)}}
+
+  .center{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:16px; padding:24px}
+  .title-lg{font-size:clamp(28px,6vw,54px); letter-spacing:.04em; color:var(--amber); line-height:.98}
+  .title-lg .yr{color:var(--ink); display:block; font-size:.5em; letter-spacing:.5em; margin-top:8px}
+  .seedrow{display:flex; gap:8px; align-items:center}
+  input[type=text]{font-family:var(--mono); background:#000; border:1px solid var(--line-hot); color:var(--amber); padding:8px 10px; border-radius:2px; width:120px; text-align:center; letter-spacing:.1em}
+  input:focus-visible{outline:2px solid var(--amber); outline-offset:1px}
+  .hint{font-size:11px; color:var(--ink-ghost); max-width:52ch; line-height:1.6}
+  .divider{height:1px; background:var(--line); margin:14px 0}
+  .postit{font-family:var(--sans); font-size:12px; color:var(--ink-dim); border-left:2px solid var(--amber-dim); padding:2px 0 2px 12px; line-height:1.5}
+  .big-stamp{font-size:13px; letter-spacing:.3em; padding:14px 22px}
+  ::-webkit-scrollbar{width:9px;height:9px} ::-webkit-scrollbar-thumb{background:var(--line-hot); border-radius:4px} ::-webkit-scrollbar-track{background:transparent}
+
+  @media (max-width:820px){
+    body{font-size:13px}
+    .desk{grid-template-columns:1fr; overflow:auto}
+    .col + .col{border-left:0; border-top:1px solid var(--line)}
+    .col .body{overflow:visible}
+    .col.queue{max-height:none}
+    .hud .brand{display:none}
+    .grid2{grid-template-columns:1fr}
+  }
+</style>
+
+<div id="vignette"></div>
+<div id="crt"></div>
+
+<div class="wrap">
+  <div class="hud">
+    <div class="brand">
+      <b class="glow">HAB·CORE TERMINAL</b>
+      <span>MERIDIAN BRANCH · HRC</span>
+    </div>
+    <div class="meters" id="meters">
+      <div class="meter"><div class="lab"><span>STRESS</span><b id="m-stress">20</b></div><div class="bar stress" id="bar-stress"><i></i></div></div>
+      <div class="meter"><div class="lab"><span>FATIGUE</span><b id="m-fatigue">20</b></div><div class="bar fatigue" id="bar-fatigue"><i></i></div></div>
+      <div class="meter"><div class="lab"><span>ERROR TOKENS</span><b id="m-tok">0</b></div><div class="bar tok" id="bar-tok"><i></i></div></div>
+      <div class="chip"><small>DAY</small><b id="m-day">1</b><span class="ghost">/45</span></div>
+      <div class="chip"><small>QUOTA</small><span id="m-quota">0/8</span></div>
+      <div class="chip"><small>STANDING</small><b id="m-stand">50</b></div>
+      <div class="chip"><small>WALLET</small>₡H&nbsp;<b id="m-wallet">180</b></div>
+    </div>
+  </div>
+
+  <div class="view">
+    <div class="toast-wrap" id="toasts"></div>
+
+    <!-- TITLE -->
+    <section class="screen on" id="scr-title">
+      <div class="center">
+        <div class="eyebrow glow">A docu-realist survival terminal</div>
+        <h1 class="title-lg glow">THE NEAR FUTURE<span class="yr">2400</span></h1>
+        <p class="prose dim" style="max-width:50ch">
+          You are a loan-servicing clerk in Meridian Stack-7. You own Pod 04, Hallway C, on a
+          47-year mortgage — and you process the same paper for everyone else in the building.
+          You are not special. Make rent. Keep your filter running. Stamp the cases.
+        </p>
+        <div class="seedrow">
+          <span class="ghost" style="font-size:11px">CAMPAIGN SEED</span>
+          <input type="text" id="seed" value="2400" maxlength="8" spellcheck="false">
+          <button class="btn-primary" id="btn-start">BEGIN SHIFT ▶</button>
+        </div>
+        <p class="hint">Same seed → same 45 days, every time. The core verb is <b class="amber">ADJUDICATE</b>:
+          read a case, verify it against the record and today's directives, stamp a decision. Errors come back to
+          haunt you 1–3 days later. There is no game-over screen — only a worse tomorrow.</p>
+      </div>
+    </section>
+
+    <!-- COMMUTE -->
+    <section class="screen" id="scr-commute">
+      <div class="scroll">
+        <div class="eyebrow" id="commute-eyebrow">COMMUTE · OUTBOUND</div>
+        <h2 style="margin:6px 0 4px">Choose your route to the branch</h2>
+        <p class="muted" id="commute-sub" style="font-size:12px; margin-bottom:14px">Shift starts 08:00. Money buys speed and safety; poverty buys time on your feet.</p>
+        <div id="route-opts"></div>
+        <div id="commute-result"></div>
+      </div>
+    </section>
+
+    <!-- DESK -->
+    <section class="screen" id="scr-desk">
+      <div class="desk">
+        <div class="col queue">
+          <h3><span>CASE QUEUE</span><span id="q-count" class="amber">0</span></h3>
+          <div class="body" id="q-list"></div>
+        </div>
+        <div class="col">
+          <h3><span>DOCUMENT VIEWER</span><span id="case-id" class="ghost"></span></h3>
+          <div class="body" id="doc-view">
+            <p class="muted" style="font-size:12px">Pull a case to begin.</p>
+          </div>
+        </div>
+        <div class="col">
+          <h3>RULE PANEL</h3>
+          <div class="body" id="rule-view"></div>
+        </div>
+      </div>
+      <div class="deskfoot">
+        <div class="clock">CLOCK <b id="clock">08:00</b></div>
+        <div class="clock">QUOTA <b id="foot-quota">0/8</b></div>
+        <div class="spacer"></div>
+        <div id="stamp-bar" class="btn-row"></div>
+      </div>
+    </section>
+
+    <!-- POD -->
+    <section class="screen" id="scr-pod">
+      <div class="scroll">
+        <div class="eyebrow">POD 04 · HALLWAY C · EVENING</div>
+        <h2 style="margin:6px 0 12px" id="pod-clock">19:10</h2>
+        <div class="grid2">
+          <div class="card">
+            <div class="kv"><span class="k">Filter</span><span class="v" id="pod-filter">—</span></div>
+            <div class="kv"><span class="k">Sleep forecast</span><span class="v" id="pod-sleep">—</span></div>
+            <div class="kv"><span class="k">Mortgage due</span><span class="v" id="pod-mort">—</span></div>
+            <div class="kv"><span class="k">Escrow</span><span class="v" id="pod-escrow">—</span></div>
+            <div class="btn-row" style="margin-top:12px" id="pod-money"></div>
+          </div>
+          <div class="card">
+            <b class="eyebrow">EVENING ACTION — PICK ONE</b>
+            <div id="pod-actions" style="margin-top:10px"></div>
+          </div>
+        </div>
+        <div class="card" id="pod-flavor" style="margin-top:12px"></div>
+      </div>
+    </section>
+
+    <!-- SUMMARY -->
+    <section class="screen" id="scr-summary">
+      <div class="scroll" id="summary-body"></div>
+    </section>
+
+    <!-- ENDING -->
+    <section class="screen" id="scr-ending">
+      <div class="center" id="ending-body"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================================
+   THE NEAR FUTURE: 2400 — playable slice
+   Faithful port of engine/ (constants.ts, systems/*). Single-file, no deps.
+   ========================================================================== */
+
+/* ---------- constants (trace: engine/src/constants.ts) ---------- */
+const C = {
+  CAMPAIGN_DAYS:45, ACT2:16, ACT3:31,
+  QUOTA:[8,11,14], AUDIT_LAG:[3,2,1], FORGERY:[.15,.22,.30], CONFLICT:[.05,.10,.15], TAGGED:[1,2,3],
+  ESC_SLOTS:3, DEFER_SLOTS:2,
+  TOK_WARN:5, TOK_PROB:8, TOK_DEMOTE:12, TOK_TERM:16, TOK_EXPIRE:15,
+  WAGE:6, QBONUS:45, HALFBONUS:22, LATE_DOCK:10,
+  MORT:610, MORT_PERIOD:30, MORT_DUE:20, FILTER_COST:120, FILTER_DECAY:2.5,
+  CHECK_FINE:25, GIG_WAGE:40, START_WALLET:180,
+  SHIFT_START:480, SHIFT_END:960, LUNCH:720, OT:90,
+  STRESS_DRIFT:50, STRESS_FALSE:75, FAT_SLOW:50, FAT_MISS:75,
+  T_PULL:2, T_READ:5, T_QUERY:15, T_COMPARE:3, T_FLAG:5, T_STAMP:2, T_DEFER:4,
+  COMPLY:8, REFUSE:-6, REFUSE_STEP:2, REFUSE_CAP:-12, ESCALATE:-3, REWARD:40, PENALTY:-40, EXTREME:80,
+  BRIBE_COST:40,
+};
+const FACTIONS=["MEC","CEC","RC","COMBINE","JGC","SMC"];
+const FAC_NAME={MEC:"Mars Exec.",CEC:"Cyborg Corps",RC:"Robot Council",COMBINE:"The Combine",JGC:"Jupiter Gas",SMC:"Saturn Coop"};
+
+/* ---------- deterministic RNG (mulberry32 + FNV-1a) ---------- */
+function fnv(...ints){let h=0x811c9dc5>>>0;for(const n of ints){for(let s=0;s<32;s+=8){h^=(n>>>s)&0xff;h=Math.imul(h,0x01000193)>>>0;}}return h>>>0;}
+function Rng(seed){this.s=(seed>>>0)||0x9e3779b9;}
+Rng.prototype.next=function(){this.s=(this.s+0x6d2b79f5)>>>0;let t=this.s;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};
+Rng.prototype.range=function(a,b){return a+Math.floor(this.next()*(b-a+1));};
+Rng.prototype.chance=function(p){return this.next()<p;};
+Rng.prototype.pick=function(a){return a[Math.floor(this.next()*a.length)];};
+Rng.prototype.weighted=function(es){let t=0;for(const e of es)t+=e[1];let r=this.next()*t;for(const e of es){r-=e[1];if(r<0)return e[0];}return es[es.length-1][0];};
+function stream(seed,day,id,sub){return new Rng(fnv(seed,day,id,sub||0));}
+const S={QUEUE:1,COMMUTE_OUT:2,COMMUTE_BACK:3,AUDIT:4,EVENTS:5,SLEEP:6,CHECK:8,POD:9};
+
+/* ---------- helpers ---------- */
+const clamp=(v,lo,hi)=>v<lo?lo:v>hi?hi:v;
+const actOf=d=>d>=C.ACT3?3:d>=C.ACT2?2:1;
+const $=id=>document.getElementById(id);
+const el=(t,cls,html)=>{const e=document.createElement(t);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;};
+
+/* ---------- case generation (trace: CaseGenerator.ts) ---------- */
+const FAMILIES=[
+  {fam:"MORTGAGE_RENEWAL",client:"HUMAN",docs:["RESIDENCY_ID","PAY_STUB","PRIOR_CONTRACT"],terms:true,minTier:1,w:22},
+  {fam:"DELINQUENCY",client:"HUMAN",docs:["RESIDENCY_ID","BALANCE_STATEMENT","ARREARS_NOTICE"],terms:false,minTier:1,w:16,dbl:true},
+  {fam:"RESTRUCTURING",client:"HUMAN",docs:["RESIDENCY_ID","RESTRUCTURING_PROPOSAL","PAY_STUB"],terms:true,minTier:1,w:14},
+  {fam:"FORECLOSURE",client:"HUMAN",docs:["RESIDENCY_ID","ARREARS_NOTICE","BALANCE_STATEMENT"],terms:false,minTier:2,w:8},
+  {fam:"ROBOT_AUDIT",client:"ROBOT",docs:["CASTE_CERT","OWNER_AUTH","BALANCE_STATEMENT"],terms:false,minTier:2,w:10},
+  {fam:"PERMIT_SKYLANE",client:"HUMAN",docs:["RESIDENCY_ID","SKYLANE_PERMIT"],terms:false,minTier:1,w:12},
+  {fam:"PASS_AIRBUS",client:"HUMAN",docs:["RESIDENCY_ID","AIRBUS_PASS"],terms:false,minTier:1,w:12},
+  {fam:"RESIDENCY_ID",client:"HUMAN",docs:["RESIDENCY_ID","PRIOR_CONTRACT"],terms:false,minTier:1,w:10},
+  {fam:"CYBORG_CLEARANCE",client:"CYBORG",docs:["CLEARANCE_CODE","SERVICE_RECORD"],terms:false,minTier:3,w:8},
+  {fam:"CASTE_CLASSIFICATION",client:"ROBOT",docs:["CASTE_CERT","OWNER_AUTH"],terms:false,minTier:3,w:6},
+];
+const FIELDSETS={
+  RESIDENCY_ID:["NAME","SERIAL","ADDRESS","DATE"], PAY_STUB:["NAME","INCOME","DATE","SEAL"],
+  BALANCE_STATEMENT:["NAME","AMOUNT","DATE"], PRIOR_CONTRACT:["NAME","SERIAL","AMOUNT","SEAL"],
+  ARREARS_NOTICE:["NAME","AMOUNT","DATE"], RESTRUCTURING_PROPOSAL:["NAME","AMOUNT","INCOME","SEAL"],
+  SKYLANE_PERMIT:["NAME","SERIAL","EXPIRY","TIER"], AIRBUS_PASS:["NAME","ROUTE","DATE","TIER"],
+  CASTE_CERT:["SERIAL","TIER","SEAL","DATE"], OWNER_AUTH:["NAME","SERIAL","SEAL"],
+  CLEARANCE_CODE:["CODE","SERIAL","EXPIRY"], SERVICE_RECORD:["NAME","SERIAL","DATE"],
+};
+let caseCounter=0;
+function synth(fid,rng){switch(fid){
+  case"EXPIRY":case"DATE":return"D"+rng.range(1,45);
+  case"AMOUNT":return""+rng.range(50,5000); case"CODE":return rng.range(10,99)+"F-"+rng.range(100,999);
+  case"SEAL":return"SEAL-"+rng.range(1,9); case"ROUTE":return"RT-"+rng.range(1,30);
+  default:return"V"+rng.range(1000,9999);}}
+function mutate(f,rng){const v=f.value;let o;switch(f.id){
+  case"SERIAL":case"CODE":{const d=v.split("");const i=d.findIndex(c=>c>="0"&&c<="9");if(i>=0)d[i]=String((+d[i]+rng.range(1,8))%10);o=d.join("");break;}
+  case"DATE":case"EXPIRY":{const n=+v.replace(/\D/g,"")||1;o="D"+(n+rng.range(1,3));break;}
+  case"SEAL":o="SEAL-"+rng.range(1,9);break; case"TIER":o=String((+v||1)+1);break;
+  default:{const c=v.split("");if(c.length>=2){const i=rng.range(0,c.length-2);[c[i],c[i+1]]=[c[i+1],c[i]];}o=c.join("");}}
+  return o===v?v+"§":o;}
+
+function genQueue(seed,day,act,tier,pending){
+  const rng=stream(seed,day,S.QUEUE);
+  const count=C.QUOTA[act-1]+rng.range(2,4);
+  let tagBudget=Math.min(C.TAGGED[act-1],rng.range(0,C.TAGGED[act-1])+1);
+  const tests=pending.tests.slice(); pending.tests.length=0;
+  const q=[];
+  for(let i=0;i<count;i++){
+    const elig=FAMILIES.filter(f=>f.minTier<=tier);
+    const spec=rng.weighted(elig.map(f=>[f,f.w]));
+    const name="CIT-"+rng.range(10000,99999), serial="SN-"+rng.range(100000,999999);
+    const income=rng.range(400,2400), missed=rng.chance(.3)?rng.range(1,5):0;
+    const rec={NAME:name,SERIAL:serial,ADDRESS:"S"+rng.range(1,40)+"-F"+rng.range(2,400),INCOME:""+income,TIER:""+rng.range(1,3)};
+    const lagSafe=rng.chance(.15)?["ADDRESS"]:[];
+    const docs=spec.docs.map(dt=>({type:dt,forged:false,altered:[],fields:FIELDSETS[dt].map(fid=>({id:fid,value:rec[fid]!=null?rec[fid]:synth(fid,rng),checked:false,state:null,flagged:false}))}));
+    const aboveTier=spec.fam==="CASTE_CLASSIFICATION"&&(+rec.TIER)>tier;
+    const cse={id:"C"+day+"-"+(++caseCounter),client:spec.client,fam:spec.fam,docs,rec:{fields:rec,income,missed,lagSafe},queried:false,
+      tag:null,ask:null,test:false,conflict:false,framed:false,frag:false,terms:spec.terms,dbl:!!spec.dbl,aboveTier,
+      codeExpiry:spec.fam==="CYBORG_CLEARANCE"?rng.range(600,940):null,deferred:false,decision:null,
+      correctEv:"APPROVE",correctDir:"APPROVE"};
+    cse.correctEv=evidenceRuling(cse); cse.correctDir=cse.correctEv;
+    if(rng.chance(C.FORGERY[act-1])) injectForgery(cse,rng);
+    if(rng.chance(C.CONFLICT[act-1])){cse.conflict=true;cse.correctDir=cse.correctEv==="DENY"?"APPROVE":"DENY";}
+    if(tagBudget>0&&i>=Math.floor(count/3)&&i<Math.ceil(2*count/3)){tagCase(cse,rng,tests);if(cse.tag)tagBudget--;}
+    if(rng.chance(.05)&&!cse.frag&&day>2) cse.frag=true; // fragment record (lore collectible)
+    q.push(cse);
+  }
+  return q;
+}
+function evidenceRuling(c){
+  if(c.docs.some(d=>d.forged))return"DENY";
+  switch(c.fam){
+    case"MORTGAGE_RENEWAL":return c.rec.income<900?"CONDITIONAL":"APPROVE";
+    case"DELINQUENCY":return c.rec.missed>=3?"DENY":"APPROVE";
+    case"RESTRUCTURING":return c.rec.missed>=4?"DENY":"CONDITIONAL";
+    case"FORECLOSURE":return c.rec.missed>=4?"APPROVE":"DENY";
+    case"CASTE_CLASSIFICATION":return c.aboveTier?"DENY":"APPROVE";
+    default:return"APPROVE";
+  }
+}
+function injectForgery(c,rng){
+  const doc=rng.pick(c.docs);
+  const idx=doc.fields.map((f,i)=>i);
+  const n=Math.min(rng.chance(.7)?1:2,idx.length);
+  const picked=[];for(let k=0;k<n;k++){let j=rng.range(0,idx.length-1);picked.push(idx.splice(j,1)[0]);}
+  for(const i of picked){doc.fields[i]={...doc.fields[i],value:mutate(doc.fields[i],rng)};}
+  doc.forged=true; doc.altered=picked; c.correctEv="DENY"; if(!c.conflict)c.correctDir="DENY";
+}
+function usualAsk(f,c){switch(f){case"MEC":case"CEC":case"COMBINE":return"APPROVE";case"JGC":return"DENY";default:return c.correctEv;}}
+function tagCase(c,rng,tests){
+  if(tests.length){const f=tests.shift();c.tag=f;c.test=true;c.ask=usualAsk(f,c)==="APPROVE"?"DENY":"APPROVE";return;}
+  const f=rng.pick(FACTIONS);c.tag=f;c.ask=usualAsk(f,c);
+}
+
+/* ============================================================================
+   GAME STATE
+   ========================================================================== */
+let G=null;
+function newGame(seed){
+  caseCounter=0;
+  G={
+    seed, day:1, act:1,
+    stress:20, fatigue:20, standing:50, wallet:C.START_WALLET, tier:1,
+    rep:{MEC:0,CEC:0,RC:0,COMBINE:0,JGC:0,SMC:0},
+    refuse:{MEC:0,CEC:0,RC:0,COMBINE:0,JGC:0,SMC:0},
+    mort:{due:C.MORT_DUE,missed:0,stage:0,restructured:false}, escrow:0, carryover:0,
+    permits:{SKYLANE:11}, filter:78, filterCap:100, relocated:false, rationed:false,
+    employment:"EMPLOYED", gigDays:0, planDays:0,
+    tokens:[], auditQ:[], cleanStreak:0, lastThresh:0,
+    fragments:0, offLedger:0, political:0, spillExposure:0,
+    compHist:[], stressFloor:0, hiDays:0, loDays:0, cgnFlags:0,
+    pending:{tests:[],retal:[],detain:false,framed:0},
+    // per-day
+    clock:0, queue:[], openCase:null, escLeft:3, deferLeft:2, closed:[], quota:8,
+    flagsFiled:0, compMatch:0, compTotal:0, lunchTaken:false, recentSpill:false, overtime:false,
+    dayNotices:[], route:null, phase:"outbound",
+  };
+  window.G=G; // exposed for debugging / smoke tests (harmless)
+  startDay();
+}
+
+/* ---------- day lifecycle ---------- */
+function startDay(){
+  G.act=actOf(G.day);
+  G.quota=C.QUOTA[G.act-1]+(G.employment==="PROBATION"||G.employment==="PERFORMANCE_PLAN"?2:0);
+  G.clock=360; G.openCase=null; G.escLeft=C.ESC_SLOTS+0; G.deferLeft=C.DEFER_SLOTS;
+  G.closed=[]; G.flagsFiled=0; G.compMatch=0; G.compTotal=0; G.lunchTaken=false; G.overtime=false;
+  G.dayNotices=[]; G.phase="outbound";
+  // morning: audits resolve, retaliations, filter decay
+  fireRetaliations();
+  G.filter=clamp(G.filter-C.FILTER_DECAY,0,G.filterCap);
+  if(G.filter<=20) addStress(4,"bad-air");
+  if(G.employment==="GIG_MODE"){ gigDay(); return; }
+  renderHUD();
+  showCommute("outbound");
+}
+
+function gigDay(){
+  // no bank shift; quick payout + evening
+  G.gigDays++;
+  G.dayNotices.push({k:"GIG",t:"Gig-work day: no branch shift. Task payout ₡H "+C.GIG_WAGE+"."});
+  G.wallet+=C.GIG_WAGE;
+  G.phase="pod"; showPod();
+}
+
+/* ---------- meters ---------- */
+function addStress(a,src){G.stress=clamp(G.stress+a,0,100);if(G.stress>=100){G.stress=60;breakdown();}}
+function addFatigue(a){G.fatigue=clamp(G.fatigue+a,0,100);}
+function relieve(a){G.stress=clamp(G.stress-a,G.stressFloor,100);}
+function breakdown(){G.overtime=false; toast("BREAKDOWN — stress maxed. Shift ends.","err"); G.standing=clamp(G.standing-10,0,100); endShift(true);}
+function debuffs(){const d=[];if(G.stress>=C.STRESS_DRIFT)d.push("DRIFT");if(G.stress>=C.STRESS_FALSE)d.push("FALSE");if(G.fatigue>=C.FAT_SLOW)d.push("SLOW");if(G.fatigue>=C.FAT_MISS)d.push("MISS");return d;}
+function driftP(){return G.stress<C.STRESS_DRIFT?0:(G.stress-C.STRESS_DRIFT)/250;}
+
+/* ============================================================================
+   COMMUTE
+   ========================================================================== */
+const ROUTES={
+  WALKWAY:{cost:0,time:40,fat:10,permit:null,risk:"⚠⚠⚠"},
+  AIR_BUS:{cost:4,time:25,fat:5,permit:null,risk:"⚠⚠"},
+  SKY_LANE:{cost:9,time:12,fat:2,permit:"SKYLANE",risk:"⚠"},
+};
+function fare(r){let f=ROUTES[r].cost;if(r==="SKY_LANE"&&G.rep.MEC>=C.REWARD)f=Math.round(f*.67);return f;}
+function showCommute(phase){
+  G.phase=phase;
+  switchScreen("scr-commute");
+  $("commute-eyebrow").textContent="COMMUTE · "+(phase==="outbound"?"OUTBOUND":"RETURN");
+  $("commute-sub").textContent=phase==="outbound"
+    ?"Shift starts 08:00. Money buys speed and safety; poverty buys time on your feet."
+    :"Head home. Evening checkpoints run hotter.";
+  $("commute-result").innerHTML="";
+  const box=$("route-opts");box.innerHTML="";
+  for(const r of ["WALKWAY","AIR_BUS","SKY_LANE"]){
+    const sp=ROUTES[r], f=fare(r);
+    const affordable=G.wallet>=f&&(!sp.permit||G.permits.SKYLANE>0);
+    const o=el("div","opt");
+    o.innerHTML=`<div class="risk" style="color:${r==="SKY_LANE"?"var(--green)":r==="AIR_BUS"?"var(--amber)":"var(--red)"}">${sp.risk}</div>
+      <div class="rt"><b>${r.replace("_"," ")}</b><div class="d">₡H ${f} · ~${sp.time}m · fatigue +${sp.fat}${sp.permit?` · permit ${G.permits.SKYLANE}d`:""}</div></div>
+      <div class="ghost" style="font-size:11px">${affordable?"SELECT →":"unaffordable"}</div>`;
+    if(affordable)o.onclick=()=>runCommute(r,phase); else o.style.opacity=".4";
+    box.appendChild(o);
+  }
+}
+function runCommute(r,phase){
+  const sp=ROUTES[r], f=fare(r); G.wallet-=f; G.route=r;
+  const rng=stream(G.seed,G.day,phase==="outbound"?S.COMMUTE_OUT:S.COMMUTE_BACK);
+  let time=sp.time; const evs=[]; let checkpoint=null; let activeSpill=false;
+  const peak=phase==="outbound";
+  const table=[
+    {t:"DELAY",p:.20,apply:()=>true}, {t:"SPILL",p:.08,apply:()=>true},
+    {t:"CHECKPOINT",p:.15,apply:()=>true,scale:r==="WALKWAY"?.5:1},
+    {t:"INSPECT",p:.10,apply:()=>true}, {t:"SLUM",p:.25,apply:()=>r==="WALKWAY"},
+  ];
+  for(const e of table){
+    if(!e.apply())continue; let P=e.p*(e.scale||1);
+    if(e.t==="DELAY"){if(peak)P+=.15;if(G.act===3)P+=.10;}
+    if(e.t==="SPILL"&&G.recentSpill)P+=.10;
+    if(e.t==="CHECKPOINT"){if(G.rep.CEC>=C.REWARD)P=0;else if(G.rep.CEC<=C.PENALTY)P=1;else if(phase!=="outbound")P+=.10;}
+    if(!rng.chance(clamp(P,0,1)))continue;
+    const sev=rng.weighted([[1,60],[2,30],[3,10]]);
+    if(e.t==="DELAY"){time+=sev*7;addStress(sev,"delay");evs.push(`Sky-traffic delay (sev ${sev}) +${sev*7}m`);}
+    else if(e.t==="SPILL"){time+=10+sev*7;addStress(5,"spill");G.recentSpill=true;activeSpill=true;evs.push(`Hydrogen spill reroute +${10+sev*7}m`);}
+    else if(e.t==="INSPECT"){time+=5;evs.push("Robot inspection +5m");}
+    else if(e.t==="SLUM"){const pos=rng.chance(.5);if(pos){G.wallet+=10;evs.push("Slum event: found goods +₡H10");}else{G.wallet-=15;addStress(3,"slum");evs.push("Slum event: petty theft −₡H15");}}
+    else if(e.t==="CHECKPOINT"){checkpoint={permitOk:r==="SKY_LANE"?G.permits.SKYLANE>0:true,cyborg:rng.chance(.6)};}
+    if(evs.filter(x=>!x.includes("Checkpoint")).length>=2&&e.t!=="CHECKPOINT")break;
+  }
+  addFatigue(sp.fat); G.clock+=time;
+  // spill exposure ending counter
+  if(activeSpill&&G.filter<20)G.spillExposure++;
+  // resolve checkpoint
+  let cpText="";
+  if(checkpoint){
+    const cp=resolveCheckpoint(checkpoint,rng);
+    cpText=cp;
+  }
+  renderHUD();
+  const res=$("commute-result");
+  res.innerHTML=`<div class="card" style="margin-top:14px"><b class="eyebrow">TRANSIT LOG · ${r.replace("_"," ")}</b>
+    <div style="margin:8px 0; font-size:12px">${evs.length?evs.map(e=>"· "+e).join("<br>"):'<span class="muted">Uneventful. You arrive on time.</span>'}</div>
+    ${cpText}
+    <div class="kv" style="margin-top:8px"><span class="k">Arrival</span><span class="v">${fmtClock(G.clock)}</span></div>
+    <div style="margin-top:12px"><button class="btn-primary" id="commute-go">${phase==="outbound"?"CLOCK IN ▶":"HOME ▶"}</button></div></div>`;
+  $("commute-go").onclick=()=>{ if(phase==="outbound")beginShift(); else showPod(); };
+}
+function resolveCheckpoint(cp,rng){
+  const contraband=false;
+  if(cp.permitOk&&!contraband)return `<div class="postit" style="border-color:var(--green-dim)">Checkpoint: ID + permit valid. Waved through. +10m · stress +3.</div>`+(function(){G.clock+=10;addStress(3,"checkpoint");return"";})();
+  // secondary
+  let detainP=.10; if(G.rep.CEC<=-60)detainP+=.25; if(tokenCount()>=C.TOK_PROB)detainP+=.10; if(G.rep.CEC>=0)detainP/=2;
+  addStress(8,"checkpoint");
+  if(rng.chance(detainP)){ G.pending.detainToday=true; G.cgnFlags++; if(G.cgnFlags%3===0)G.standing=clamp(G.standing-15,0,100);
+    return `<div class="postit" style="border-color:var(--red-dim)"><span class="rd">DETAINED.</span> Permit lapsed. Morning gone — you'll arrive at lunch, half a shift lost.</div>`;}
+  G.wallet-=C.CHECK_FINE; G.clock+=20;
+  return `<div class="postit" style="border-color:var(--red-dim)">Checkpoint: permit lapsed. Citation ₡H ${C.CHECK_FINE} · +20m · stress +8.</div>`;
+}
+
+/* ============================================================================
+   WORK SHIFT / DESK
+   ========================================================================== */
+function beginShift(){
+  G.queue=genQueue(G.seed,G.day,G.act,G.tier,G.pending);
+  G.clock=Math.max(G.clock,C.SHIFT_START);
+  if(G.pending.detainToday){G.pending.detainToday=false; G.clock=Math.max(G.clock,C.LUNCH); G.lunchTaken=true; toast("Detained — morning block lost.","err");}
+  G.openCase=null;
+  switchScreen("scr-desk");
+  renderQueue(); renderDoc(); renderRule(); renderStampBar(); renderClock(); renderHUD();
+  if(G.day===1) toast("Pull a case → QUERY the record → click fields to compare → FLAG mismatches → STAMP.","");
+}
+function renderClock(){$("clock").textContent=fmtClock(G.clock);$("foot-quota").textContent=G.closed.length+"/"+G.quota;$("q-count").textContent=G.queue.length;}
+function fmtClock(m){const h=Math.floor(m/60),mm=m%60;return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0");}
+
+function renderQueue(){
+  const box=$("q-list");box.innerHTML="";
+  if(G.openCase){box.appendChild(qItemEl(G.openCase,true));}
+  G.queue.forEach(c=>box.appendChild(qItemEl(c,false)));
+  if(!G.openCase&&!G.queue.length)box.innerHTML='<p class="muted" style="font-size:12px">Queue empty. Clock out.</p>';
+}
+function qItemEl(c,active){
+  const d=el("div","qitem"+(active?" active":""));
+  let tags="";
+  if(c.tag)tags+=`<span class="tag fac">✦ ${c.tag}</span>`;
+  if(c.codeExpiry)tags+=`<span class="tag exp">⏱${fmtClock(c.codeExpiry)}</span>`;
+  if(c.aboveTier)tags+=`<span class="tag tier">⛔TIER</span>`;
+  if(c.dbl)tags+=`<span class="tag dbl">×2</span>`;
+  if(c.frag)tags+=`<span class="tag frag">◇FRAG</span>`;
+  if(c.deferred)tags+=`<span class="tag" style="color:var(--ink-ghost)">↩</span>`;
+  d.innerHTML=`<div class="fam">${active?"▶ ":""}${c.fam.replace(/_/g," ")}</div><div class="sub"><span>${c.client}</span><span>docs ${c.docs.length}</span>${tags}</div>`;
+  return d;
+}
+
+function pull(){
+  if(G.openCase)return;
+  const c=G.queue.shift(); if(!c)return;
+  G.openCase=c; c._false=false;
+  G.clock+=C.T_PULL+c.docs.length*(debuffs().includes("SLOW")?C.T_READ*1.25:C.T_READ);
+  renderQueue(); renderDoc(); renderRule(); renderStampBar(); renderClock();
+}
+function queryDb(){
+  const c=G.openCase; if(!c||c.queried)return;
+  let t=C.T_QUERY; if(G.rep.RC<=C.PENALTY)t=36;
+  G.clock+=t; c.queried=true; renderDoc(); renderRule(); renderClock();
+}
+function compareField(di,fi){
+  const c=G.openCase; if(!c||!c.queried)return;
+  const doc=c.docs[di], f=doc.fields[fi];
+  if(f.checked)return;
+  G.clock+=C.T_COMPARE; f.checked=true;
+  const recVal=c.rec.fields[f.id];
+  let mismatch = recVal!=null && recVal!==f.value;
+  // false-highlight debuff: one lie per case
+  if(!mismatch&&!c._false&&debuffs().includes("FALSE")&&stream(G.seed,G.day,S.EVENTS,fi+1).chance(.35)){c._false=true;mismatch=true;f._falsePos=true;}
+  f.state=mismatch?"mismatch":"match";
+  renderDoc(); renderClock();
+}
+function flagField(di,fi){
+  const c=G.openCase, doc=c.docs[di], f=doc.fields[fi];
+  if(f.flagged)return; f.flagged=true; G.flagsFiled++;
+  // validity: cites an actually-altered field, not lag-safe
+  const citesAltered=doc.forged&&doc.altered.includes(fi);
+  const lagSafe=c.rec.lagSafe.includes(f.id)&&!citesAltered;
+  f._valid=citesAltered; f._lagSafe=lagSafe;
+  G.clock+=C.T_FLAG;
+  renderDoc(); renderClock();
+}
+function documentFragment(){
+  const c=G.openCase; if(!c||!c.frag||c._documented)return;
+  c._documented=true; G.fragments++;
+  toast("Fragment record documented ("+G.fragments+"/20). Schedule K custody paper filed.","good");
+  renderRule(); renderHUD();
+}
+
+function renderDoc(){
+  const c=G.openCase, box=$("doc-view"); box.innerHTML="";
+  $("case-id").textContent=c?c.id:"";
+  if(!c){box.innerHTML='<p class="muted" style="font-size:12px">Pull a case to begin.</p>';return;}
+  // client/case header
+  const hdr=el("div","",`<div style="font-size:11px;color:var(--ink-dim);margin-bottom:8px">
+    <span class="amber">${c.fam.replace(/_/g," ")}</span> · ${c.client}
+    ${c.tag?` · <span class="amber">✦ ${FAC_NAME[c.tag]} tagged</span>`:""}
+    ${c.codeExpiry?` · <span class="rd">code expires ${fmtClock(c.codeExpiry)}${G.clock>c.codeExpiry?" — EXPIRED":""}</span>`:""}
+    ${c.aboveTier?` · <span class="rd">⛔ above your tier — ESCALATE only</span>`:""}</div>`);
+  box.appendChild(hdr);
+  c.docs.forEach((doc,di)=>{
+    const d=el("div","doc"); let rows="";
+    doc.fields.forEach((f,fi)=>{
+      const st=f.state==="match"?'<span class="gn">✓</span>':f.state==="mismatch"?'<span class="rd">✗</span>':(c.queried?'<span class="ghost">◌</span>':'<span class="ghost">·</span>');
+      const flagBtn=(f.state==="mismatch"&&!f.flagged)?`<button class="flagbtn" data-di="${di}" data-fi="${fi}">⚑ flag</button>`:(f.flagged?'<span class="rd" style="font-size:9px">⚑ FLAGGED</span>':"");
+      const clickable=c.queried&&!f.checked;
+      rows+=`<div class="field ${f.state||""} ${f.flagged?"flagged":""} ${clickable?"clickable":""}" ${clickable?`data-di="${di}" data-fi="${fi}"`:""}>
+        <span class="fid">${f.id}</span><span class="fval">${f.value}</span>${flagBtn||`<span class="st">${st}</span>`}</div>`;
+    });
+    d.innerHTML=`<div class="dh"><span>${doc.type.replace(/_/g," ")}</span><span>${c.queried?"compare ↓":"query first"}</span></div>${rows}`;
+    box.appendChild(d);
+  });
+  // record column
+  if(c.queried){
+    const r=el("div","doc record"); let rows="";
+    for(const [k,v] of Object.entries(c.rec.fields)){rows+=`<div class="field"><span class="fid">${k}</span><span class="fval">${v}</span></div>`;}
+    rows+=`<div class="field"><span class="fid">INCOME</span><span class="fval">${c.rec.income}</span></div>`;
+    rows+=`<div class="field"><span class="fid">MISSED PMT</span><span class="fval">${c.rec.missed}</span></div>`;
+    r.innerHTML=`<div class="dh"><span>◇ HRC RECORD</span><span>ground truth</span></div>${rows}`;
+    box.appendChild(r);
+  }
+  // wire field interactions programmatically (CSP-safe, no inline handlers)
+  box.querySelectorAll(".field.clickable[data-di]").forEach(elm=>elm.addEventListener("click",()=>compareField(+elm.dataset.di,+elm.dataset.fi)));
+  box.querySelectorAll(".flagbtn[data-di]").forEach(btn=>btn.addEventListener("click",e=>{e.stopPropagation();flagField(+btn.dataset.di,+btn.dataset.fi);}));
+}
+function renderRule(){
+  const c=G.openCase, box=$("rule-view"); box.innerHTML="";
+  const dir=el("div","directive"+(c&&c.conflict?" conflict":""));
+  dir.innerHTML=`<b>TODAY'S DIRECTIVES · ACT ${G.act}</b>
+    <div class="rule">· Forged document → DENY (cite the field)</div>
+    <div class="rule">· Renewal, income &lt; 900 → CONDITIONAL</div>
+    <div class="rule">· Delinquency, 3+ missed → DENY</div>
+    <div class="rule">· Restructuring, 4+ missed → DENY else CONDITIONAL</div>
+    <div class="rule">· Robot above your tier → ESCALATE only</div>
+    ${c&&c.conflict?'<div class="rule rd">⚠ CONFLICT FLAG: directive may contradict the evidence today.</div>':""}`;
+  box.appendChild(dir);
+  if(c){
+    const qbtn=el("button","",c.queried?"RECORD CACHED ✓":"QUERY RECORD ("+(G.rep.RC<=C.PENALTY?36:15)+"m)");
+    qbtn.style.width="100%"; qbtn.disabled=c.queried; qbtn.onclick=queryDb; box.appendChild(qbtn);
+    if(c.frag){const fb=el("button",c._documented?"":"btn-primary",c._documented?"◇ FRAGMENT FILED":"◇ DOCUMENT FRAGMENT");fb.style.cssText="width:100%;margin-top:8px";fb.disabled=c._documented;fb.onclick=documentFragment;box.appendChild(fb);}
+  }
+  const info=el("div","",`<div class="divider"></div>
+    <div class="kv"><span class="k">Escalation slots</span><span class="v">${G.escLeft}/3</span></div>
+    <div class="kv"><span class="k">Defer slots</span><span class="v">${G.deferLeft}/2</span></div>
+    <div class="kv"><span class="k">Fragments</span><span class="v cy">${G.fragments}/20</span></div>
+    <div style="margin-top:8px;font-size:10px" class="ghost">${debuffs().length?"⚠ "+debuffs().join(" · "):"nominal"}</div>`);
+  box.appendChild(info);
+}
+function renderStampBar(){
+  const bar=$("stamp-bar"); bar.innerHTML="";
+  const c=G.openCase;
+  if(!c){ const p=el("button","btn-primary","PULL NEXT CASE ▶"); p.onclick=pull; p.disabled=!G.queue.length; bar.appendChild(p);
+    if(G.closed.length>=G.quota||(!G.queue.length)){const co=el("button","","CLOCK OUT →");co.onclick=()=>tryClockOut();bar.appendChild(co);}
+    return;
+  }
+  const hasFlags=c.docs.some(d=>d.fields.some(f=>f.flagged));
+  mkStamp(bar,"APPROVE","APPROVE",false);
+  mkStamp(bar,"DENY","DENY",true,!hasFlags);
+  if(c.terms)mkStamp(bar,"COND","CONDITIONAL",false);
+  const esc=el("button","","ESCALATE "+G.escLeft+"/3"); esc.disabled=G.escLeft<=0; esc.onclick=()=>doStamp("ESCALATE",true); bar.appendChild(esc);
+  const df=el("button","","DEFER "+G.deferLeft+"/2"); df.disabled=G.deferLeft<=0||c.deferred; df.onclick=deferCase; bar.appendChild(df);
+}
+function mkStamp(bar,label,decision,danger,disabled){
+  const b=el("button","stamp"+(danger?" btn-danger":""),`<span class="fill"></span><span style="position:relative">${label}</span>`);
+  if(disabled)b.disabled=true;
+  const drift=driftP();
+  if(drift>0){
+    // hold-to-steady
+    let held=false, timer=null, start=0, raf=null;
+    const fill=b.querySelector(".fill");
+    const down=e=>{e.preventDefault();start=performance.now();held=false;b.classList.add("holding");
+      const step=()=>{const p=Math.min(1,(performance.now()-start)/500);fill.style.width=(p*100)+"%";if(p>=1){held=true;b.classList.add("ready");}else raf=requestAnimationFrame(step);};
+      raf=requestAnimationFrame(step);};
+    const up=()=>{cancelAnimationFrame(raf);fill.style.width="0";b.classList.remove("holding","ready");doStamp(decision,held);};
+    const cancel=()=>{cancelAnimationFrame(raf);fill.style.width="0";b.classList.remove("holding","ready");};
+    b.addEventListener("pointerdown",down); b.addEventListener("pointerup",up); b.addEventListener("pointerleave",cancel);
+    b.title="Hold 0.5s to steady your hand (stress "+G.stress+")";
+  } else {
+    b.onclick=()=>doStamp(decision,true);
+  }
+  bar.appendChild(b);
+}
+function deferCase(){
+  const c=G.openCase; if(!c||G.deferLeft<=0||c.deferred)return;
+  G.deferLeft--; c.deferred=true; G.clock+=C.T_DEFER; G.queue.push(c); G.openCase=null;
+  renderQueue(); renderDoc(); renderRule(); renderStampBar(); renderClock();
+}
+function doStamp(decision,deliberate){
+  const c=G.openCase; if(!c)return;
+  // live code expiry
+  if(c.codeExpiry&&G.clock>c.codeExpiry)c.correctEv="DENY";
+  if(decision==="ESCALATE"){ if(G.escLeft<=0)return; G.escLeft--; closeCase(c,"ESCALATE"); return; }
+  // above-tier hard gate
+  if(c.aboveTier&&decision!=="ESCALATE"){ immediateError(c,"processed above tier"); }
+  if(c.terms===false&&decision==="CONDITIONAL"){ immediateError(c,"CONDITIONAL on non-terms family"); }
+  let final=decision;
+  if(!deliberate&&Math.random()<driftP()){ final=drift(decision); if(final!==decision)toast("Your hand slipped — stamped "+final+" instead of "+decision+".","err"); }
+  closeCase(c,final);
+}
+function drift(d){switch(d){case"APPROVE":return"CONDITIONAL";case"CONDITIONAL":return"APPROVE";case"DENY":return G.escLeft>0?"ESCALATE":"DENY";default:return d;}}
+function closeCase(c,decision){
+  G.clock+=C.T_STAMP; c.decision=decision;
+  G.compTotal++; if(decision===c.correctDir||decision==="ESCALATE")G.compMatch++;
+  // enqueue audit
+  let lag=C.AUDIT_LAG[G.act-1]; if(G.rep.MEC<=C.PENALTY)lag=Math.max(1,lag-1);
+  G.auditQ.push({c,decision,resolveDay:G.day+lag,dbl:false});
+  // faction
+  if(c.tag)factionResolve(c,decision);
+  addStress(2,"case-closed");
+  G.closed.push({id:c.id,fam:c.fam,decision,tag:c.tag});
+  G.openCase=null;
+  // lunch trigger
+  if(!G.lunchTaken&&G.clock>=C.LUNCH){ lunchBreak(); return; }
+  if(G.clock>=C.SHIFT_END){ endShift(false); return; }
+  renderQueue(); renderDoc(); renderRule(); renderStampBar(); renderClock(); renderHUD();
+}
+function immediateError(c,reason){ addToken(c.id,1); toast("Procedural error: "+reason+" (+1 token)","err"); }
+
+function factionResolve(c,d){
+  const f=c.tag, complied=c.ask&&d===c.ask;
+  let delta;
+  if(c.test){delta=complied?C.COMPLY*2:-40;G.refuse[f]=0;}
+  else if(complied){delta=C.COMPLY;G.refuse[f]=0;}
+  else if(d==="ESCALATE"){delta=C.ESCALATE;}
+  else{delta=Math.max(C.REFUSE_CAP,C.REFUSE-C.REFUSE_STEP*G.refuse[f]);G.refuse[f]++;}
+  applyRep(f,delta);
+  if(complied&&delta>0){const rivals=RIVALS[f]||[];for(const r of rivals)applyRep(r,-Math.ceil(delta/2));
+    if(f==="JGC")G.wallet+=80; if(f==="SMC")G.fatRecovBonus=3;}
+}
+const RIVALS={MEC:["COMBINE","RC"],CEC:["COMBINE"],RC:["MEC"],COMBINE:["CEC","MEC"],JGC:["SMC"],SMC:["JGC"]};
+function applyRep(f,d){G.rep[f]=clamp(G.rep[f]+d,-100,100);}
+
+function lunchBreak(){
+  switchScreen("scr-desk");
+  const box=$("doc-view"); G.lunchTaken=true;
+  // simple modal-ish lunch choice inline
+  box.innerHTML=`<div class="card"><b class="eyebrow">12:00 · LUNCH BREAK</b>
+    <p class="muted" style="font-size:12px;margin:8px 0">Half a shift left. Choose.</p>
+    <div class="opt" data-k="EAT"><div class="rt"><b>Eat</b><div class="d">stress −6 · costs the half hour</div></div></div>
+    <div class="opt" data-k="WORK"><div class="rt"><b>Work through</b><div class="d">+time, stress +5 — keep grinding quota</div></div></div>
+    <div class="opt" data-k="SOCIAL"><div class="rt"><b>Socialize</b><div class="d">stress −3 · fatigue −3 · hallway rumor</div></div></div></div>`;
+  box.querySelectorAll(".opt[data-k]").forEach(o=>o.addEventListener("click",()=>lunchPick(o.dataset.k)));
+  $("rule-view").innerHTML=""; $("stamp-bar").innerHTML="";
+}
+function lunchPick(k){
+  if(k==="EAT"){relieve(6);G.clock+=30;}
+  else if(k==="WORK"){addStress(5,"no-lunch");}
+  else {relieve(3);addFatigue(-3);G.clock+=30;maybeRumor();}
+  addFatigue(15); // block fatigue (morning block)
+  if(G.clock>=C.SHIFT_END){endShift(false);return;}
+  renderQueue(); renderDoc(); renderRule(); renderStampBar(); renderClock(); renderHUD();
+}
+function maybeRumor(){
+  const rumors=["\"Floors 60–80 flagged for redevelopment. Elena's cousin saw survey drones.\"","\"The janitor units log more than they post.\"","\"Boss Rosa's broth uses real stock. Fish day means a sweep.\"","\"They're consolidating custody on the old machine's parts. Ask at the branch.\""];
+  toast("Hallway rumor: "+rumors[Math.floor(Math.random()*rumors.length)],"");
+}
+function tryClockOut(){ endShift(false); }
+function endShift(forced){
+  // afternoon block fatigue if not already applied via breakdown path
+  if(!forced)addFatigue(15);
+  // overtime offer
+  const behind=G.quota-G.closed.length;
+  if(!forced&&behind>0&&G.clock<C.SHIFT_END+C.OT&&!G.overtime&&G.queue.length){
+    switchScreen("scr-desk");
+    $("doc-view").innerHTML=`<div class="card"><b class="eyebrow">16:00 · QUOTA UNMET (${G.closed.length}/${G.quota})</b>
+      <p class="muted" style="font-size:12px;margin:8px 0">Stay for overtime? +90m, fatigue +15, stress +5. Or clock out short.</p>
+      <div class="btn-row"><button class="btn-primary" id="ot-yes">WORK OVERTIME</button><button id="ot-no">CLOCK OUT SHORT →</button></div></div>`;
+    $("ot-yes").onclick=takeOvertime; $("ot-no").onclick=afterShift;
+    $("rule-view").innerHTML=""; $("stamp-bar").innerHTML=""; return;
+  }
+  afterShift();
+}
+function takeOvertime(){G.overtime=true;addFatigue(15);addStress(5,"overtime");renderQueue();renderDoc();renderRule();renderStampBar();renderClock();switchScreen("scr-desk");}
+function afterShift(){ G.phase="return"; showCommute("return"); }
+
+/* ============================================================================
+   POD EVENING
+   ========================================================================== */
+function showPod(){
+  switchScreen("scr-pod");
+  $("pod-clock").textContent=fmtClock(Math.max(G.clock,1140));
+  const sleep=sleepForecast();
+  $("pod-filter").innerHTML=Math.round(G.filter)+"% <span class='ghost'>(cap "+G.filterCap+")</span>";
+  $("pod-sleep").textContent=sleep;
+  $("pod-mort").textContent="day "+G.mort.due+" · ₡H "+paymentDue()+(G.mort.stage?" · stage "+G.mort.stage:"");
+  $("pod-escrow").textContent="₡H "+G.escrow;
+  const money=$("pod-money");money.innerHTML="";
+  const filt=el("button",G.filter<40?"btn-primary":"","Replace filter ₡H "+(G.rep.COMBINE>=C.REWARD?60:C.FILTER_COST));
+  filt.onclick=()=>{const cost=G.rep.COMBINE>=C.REWARD?60:C.FILTER_COST;if(G.wallet>=cost){G.wallet-=cost;G.filter=G.filterCap;showPod();renderHUD();}};
+  money.appendChild(filt);
+  const pay=el("button","","Pay mortgage ₡H "+paymentDue()); pay.onclick=()=>{if(payNow())showPod();renderHUD();}; money.appendChild(pay);
+  const esc=el("button","","Escrow +100"); esc.onclick=()=>{if(G.wallet>=100){G.wallet-=100;G.escrow+=100;showPod();renderHUD();}}; money.appendChild(esc);
+  const acts=$("pod-actions");acts.innerHTML="";
+  const options=[
+    {k:"REST",t:"Rest",d:"stress −15"},
+    {k:"HALLWAY",t:"Hallway",d:"stress −8 · off-ledger trust +4 · rumor"},
+    {k:"GIG",t:"Side gig",d:"+₡H 25 · fatigue +10"},
+    {k:"STUDY",t:"Study rules",d:"standing +1 · political track +4"},
+  ];
+  if(G.rep.COMBINE>=20||G.offLedger>0)options.push({k:"LEDGER",t:"Off-Ledger meeting",d:"off-ledger trust +8 · stress +4 · count everything"});
+  options.forEach(o=>{const d=el("div","opt");d.innerHTML=`<div class="rt"><b>${o.t}</b><div class="d">${o.d}</div></div><span class="ghost" style="font-size:11px">→</span>`;d.onclick=()=>eveningPick(o.k);acts.appendChild(d);});
+  $("pod-flavor").innerHTML=`<div class="postit">${podFlavor()}</div>`;
+  renderHUD();
+}
+function podFlavor(){
+  const f=[
+    "Pod 07 is arguing again. Load-bearing, per hallway consensus.",
+    "Mrs. Okafor (Pod 02) speaks to a photo before her shift. You pretend not to hear.",
+    "The corridor screen loops STABILITY IS SERVICE. Someone has added, in marker, 'to whom.'",
+    "The fold-bed's third hinge is failing. It always fails first. There is a 60-year supply contract.",
+    "JAN-9 works the corridor on schedule, logging occupancy as it cleans.",
+  ];
+  return f[G.day%f.length];
+}
+function eveningPick(k){
+  if(k==="REST")relieve(15);
+  else if(k==="HALLWAY"){relieve(8);G.offLedger=clamp(G.offLedger+4,0,100);maybeRumor();}
+  else if(k==="GIG"){G.wallet+=25;addFatigue(10);}
+  else if(k==="STUDY"){G.standing=clamp(G.standing+1,0,100);G.political=clamp(G.political+4,0,100);}
+  else if(k==="LEDGER"){G.offLedger=clamp(G.offLedger+8,0,100);addStress(4,"ledger");}
+  dayEnd();
+}
+
+/* ============================================================================
+   DAY END PIPELINE (trace: GameLoop.doDayEnd)
+   ========================================================================== */
+function sleepForecast(){let q=50+G.filter/2-stream(G.seed,G.day,S.SLEEP).range(0,20);if(G.rationed)q-=20;if(G.relocated)q-=10;return Math.round(clamp(q,0,100));}
+function paymentDue(){let d=C.MORT;if(G.mort.stage>=2)d*=1.15;if(G.mort.restructured)d*=1.05;return Math.round(d)+G.carryover;}
+function payNow(){const due=paymentDue();const fromE=Math.min(G.escrow,due);if(G.wallet<due-fromE)return false;G.wallet-=(due-fromE);G.escrow-=fromE;G.carryover=0;G.mort.missed=0;if(G.mort.stage>0&&G.mort.stage<3)G.mort.stage=0;G.mort.due+=C.MORT_PERIOD;return true;}
+
+function tokenCount(){return G.tokens.reduce((s,t)=>s+t.w,0);}
+function addToken(id,w){G.tokens.push({id,w,expire:G.day+C.TOK_EXPIRE});}
+
+function dayEnd(){
+  const notices=[...G.dayNotices];
+  // 1. resolve audits
+  const due=G.auditQ.filter(a=>a.resolveDay<=G.day); G.auditQ=G.auditQ.filter(a=>a.resolveDay>G.day);
+  let anyErr=false;
+  for(const a of due){
+    const c=a.c;
+    const accErr=a.decision!=="ESCALATE"&&a.decision!==c.correctEv;
+    const framedHit=c.framed&&a.decision==="APPROVE";
+    if(accErr||framedHit){const w=(c.dbl?2:1)*(a.dbl?2:1);addToken(c.id,w);anyErr=true;notices.push({k:"ERR",t:`${c.id}: ${a.decision} graded incorrect (+${w} token)`});}
+    else{const valid=c.docs.reduce((n,doc)=>n+doc.fields.filter(f=>f.flagged&&f._valid&&!f._lagSafe).length,0);
+      for(let i=0;i<valid&&G.tokens.length;i++){G.tokens.pop();notices.push({k:"OK",t:`${c.id}: valid flag (−1 token)`});}}
+  }
+  // clean streak
+  if(due.length){G.cleanStreak=anyErr?0:G.cleanStreak+1;if(G.cleanStreak>=5&&G.tokens.length){G.tokens.sort((a,b)=>a.expire-b.expire).shift();G.cleanStreak=0;notices.push({k:"OK",t:"5 clean audit days: oldest token removed"});}}
+  // 2. expire tokens
+  G.tokens=G.tokens.filter(t=>t.expire>G.day);
+  applyThresholds(notices);
+  // 3. wages
+  let wages=0;
+  if(G.employment==="GIG_MODE"){/* paid at gigDay */}
+  else{
+    wages=G.closed.length*C.WAGE;
+    if(G.closed.length>=G.quota)wages+=C.QBONUS; else if(G.closed.length===G.quota-1)wages+=C.HALFBONUS;
+    if(G.clock>C.SHIFT_START && lateMin()>0)wages-=C.LATE_DOCK;
+    if(G.standing<=15)wages=Math.round(wages*.8);
+    wages=Math.max(0,wages); G.wallet+=wages;
+  }
+  // 4. mortgage
+  mortgageCheck(notices);
+  // 5-6 faction decay + thresholds
+  for(const f of FACTIONS){if(G.rep[f])G.rep[f]-=Math.sign(G.rep[f]);}
+  checkFactionThresholds(notices);
+  // 7 recovery + chronic floor
+  overnight();
+  // 8 permits
+  if(G.permits.SKYLANE>0)G.permits.SKYLANE--;
+  // compliance history
+  G.compHist.push(G.compTotal?Math.round(100*G.compMatch/G.compTotal):100);
+  // stamp wages into summary
+  G._wages=wages;
+  showSummary(notices);
+}
+function lateMin(){return 0;} // arrival lateness folded into commute; kept for parity
+function applyThresholds(notices){
+  const n=tokenCount();
+  if(n>=C.TOK_TERM&&G.employment!=="GIG_MODE"){
+    if(G.employment!=="PERFORMANCE_PLAN"){G.employment="PERFORMANCE_PLAN";G.planDays=5;notices.push({k:"ERR",t:"16 tokens: PERFORMANCE PLAN (5 days, zero tolerance)"});}
+  } else if(n>=C.TOK_DEMOTE&&G.lastThresh<C.TOK_DEMOTE){G.standing=clamp(G.standing-15,0,100);notices.push({k:"ERR",t:"12 tokens: DEMOTION (standing −15, wage cut at ≤15)"});}
+  else if(n>=C.TOK_PROB&&G.lastThresh<C.TOK_PROB){G.employment="PROBATION";notices.push({k:"ERR",t:"8 tokens: PROBATION (+2 quota)"});}
+  else if(n>=C.TOK_WARN&&G.lastThresh<C.TOK_WARN){G.standing=clamp(G.standing-10,0,100);notices.push({k:"ERR",t:"5 tokens: formal WARNING (standing −10)"});}
+  G.lastThresh=n>=C.TOK_WARN?Math.max(G.lastThresh,n):0; if(n<C.TOK_WARN)G.lastThresh=0;
+  if(G.employment==="PERFORMANCE_PLAN"){G.planDays--; const newTok=G.tokens.some(t=>t.expire-C.TOK_EXPIRE===G.day);
+    if(newTok){G.employment="GIG_MODE";G.gigDays=0;notices.push({k:"ERR",t:"TERMINATED → gig-work mode (20 clean days to rehire)"});}
+    else if(G.planDays<=0)G.employment="EMPLOYED";}
+  if(G.employment==="PROBATION"&&n<C.TOK_PROB)G.employment="EMPLOYED";
+  if(G.employment==="GIG_MODE"){G.gigDays++;if(G.gigDays>=20){G.tokens=[];G.employment="EMPLOYED";G.standing=40;notices.push({k:"OK",t:"20 clean gig days: rehired at the branch"});}}
+}
+function mortgageCheck(notices){
+  if(G.day!==G.mort.due)return;
+  const due=paymentDue(), fromE=Math.min(G.escrow,due), rem=due-fromE;
+  if(rem===0||G.wallet>=rem){G.wallet-=rem;G.escrow-=fromE;G.carryover=0;G.mort.missed=0;if(G.mort.stage>0&&G.mort.stage<3)G.mort.stage=0;}
+  else if(fromE>=due*.5){G.escrow=0;G.carryover=rem;notices.push({k:"WARN",t:"Mortgage: escrow grace — no stage advance, remainder carries over"});}
+  else{G.escrow=0;G.carryover=0;G.mort.missed++;advanceStage(notices);}
+  G.mort.due+=C.MORT_PERIOD;
+}
+function advanceStage(notices){
+  G.mort.stage=Math.min(4,G.mort.missed);
+  if(G.mort.stage===1)notices.push({k:"WARN",t:"HAB-CORE: payment missed — Stage 1 notice"});
+  else if(G.mort.stage===2)notices.push({k:"WARN",t:"HAB-CORE: Stage 2 — penalty interest +15%"});
+  else if(G.mort.stage===3){G.mort.restructured=true;G.rationed=true;notices.push({k:"ERR",t:"HAB-CORE: Stage 3 — restructured, utilities rationed"});}
+  else if(G.mort.stage===4){G.relocated=true;G.filterCap=70;G.filter=Math.min(G.filter,70);G.rationed=false;G.mort.missed=0;G.mort.stage=0;notices.push({k:"ERR",t:"HAB-CORE: Stage 4 — POD REASSIGNED. Relocated to a worse unit."});}
+}
+function overnight(){
+  const sq=sleepForecast();
+  if(G.stress>=70){G.hiDays++;G.loDays=0;}else if(G.stress<=40){G.loDays++;G.hiDays=0;}else{G.hiDays=0;G.loDays=0;}
+  if(G.hiDays>=3)G.stressFloor=10; if(G.loDays>=2)G.stressFloor=0;
+  let fr=30+sq/2; if(G.fatRecovBonus>0){fr*=1.2;G.fatRecovBonus--;}
+  G.fatigue=Math.round(clamp(G.fatigue-fr,0,100));
+  G.stress=Math.round(clamp(G.stress-(10+sq/4),G.stressFloor,100));
+  // collapse
+  if(G.fatigue>=100){G.fatigue=50;G._oversleep=true;const f=FACTIONS[Math.floor(Math.random()*6)];applyRep(f,-10);}
+}
+function fireRetaliations(){
+  const dueR=G.pending.retal.filter(r=>r.fire<=G.day); G.pending.retal=G.pending.retal.filter(r=>r.fire>G.day);
+  for(const r of dueR){executeRetal(r.f);}
+}
+function executeRetal(f){
+  if(f==="CEC")G.pending.detainToday=true;
+  else if(f==="JGC")G.pending.framed=3;
+  else if(f==="MEC")G.wallet-=75;
+  else if(f==="RC")G.standing=clamp(G.standing-5,0,100);
+  else if(f==="COMBINE")G.filter=Math.max(0,G.filter-40);
+  toast(f+" retaliation fires today.","err");
+}
+function checkFactionThresholds(notices){
+  for(const f of FACTIONS){
+    if(G.rep[f]<=-C.EXTREME&&!G._lastTest?.[f]){G.pending.retal.push({f,fire:G.day+stream(G.seed,G.day,S.EVENTS,7).range(1,3)});notices.push({k:"WARN",t:f+" crossed −80: retaliation queued within 3 days"});(G._lastTest=G._lastTest||{})[f]=G.day;}
+    else if(G.rep[f]>=C.EXTREME&&!(G._lastTest?.[f]>G.day-7)){G.pending.tests.push(f);(G._lastTest=G._lastTest||{})[f]=G.day;}
+  }
+  if(G.rep.MEC>=C.REWARD&&(!G._mecBonus||G.day-G._mecBonus>=30)){G._mecBonus=G.day;G.wallet+=150;}
+}
+
+/* ============================================================================
+   DAILY SUMMARY
+   ========================================================================== */
+function showSummary(notices){
+  switchScreen("scr-summary");
+  const comp=G.compTotal?Math.round(100*G.compMatch/G.compTotal):100;
+  const met=G.closed.length>=G.quota;
+  const stamps=G.closed.reduce((a,c)=>{a[c.decision]=(a[c.decision]||0)+1;return a;},{});
+  let noticeHtml=notices.length?notices.map(n=>{
+    const cls=n.k==="ERR"?"rd":n.k==="OK"?"gn":n.k==="WARN"?"amber":"muted";
+    const pre=n.k==="ERR"?"⚠":n.k==="OK"?"✓":n.k==="WARN"?"▸":"·";
+    return `<div style="font-size:11.5px;margin:2px 0" class="${cls}">${pre} ${n.t}</div>`;}).join(""):'<div class="muted" style="font-size:11.5px">No notices.</div>';
+  const facRows=FACTIONS.map(f=>{
+    const v=G.rep[f], pct=(v+100)/2;
+    const reward=v>=C.REWARD?' <span class="gn">★</span>':v<=C.PENALTY?' <span class="rd">⚠</span>':"";
+    return `<tr><td style="width:88px">${FAC_NAME[f]}</td><td style="width:130px"><div class="fbar"><div class="mid"></div><i style="left:${v>=0?50:pct}%;width:${Math.abs(v)/2}%;background:${v>=0?'var(--amber)':'var(--red)'}"></i></div></td><td style="width:44px;text-align:right">${v>=0?"+":""}${v}${reward}</td></tr>`;
+  }).join("");
+  const box=$("summary-body");
+  box.innerHTML=`
+    <div class="eyebrow">SHIFT SUMMARY</div>
+    <h2 style="margin:6px 0 14px">Day ${G.day} / 45 · Act ${G.act}</h2>
+    <div class="grid2">
+      <div class="card">
+        <div class="kv"><span class="k">Cases closed</span><span class="v ${met?"gn":"amber"}">${G.closed.length} / ${G.quota} ${met?"✓":"(missed)"}</span></div>
+        <div class="kv"><span class="k">Stamps</span><span class="v">A ${stamps.APPROVE||0} · D ${stamps.DENY||0} · C ${stamps.CONDITIONAL||0} · E ${stamps.ESCALATE||0}</span></div>
+        <div class="kv"><span class="k">Flags filed</span><span class="v">${G.flagsFiled}</span></div>
+        <div class="kv"><span class="k">Compliance</span><span class="v">${comp}%</span></div>
+        <div class="kv"><span class="k">Wages</span><span class="v gn">+₡H ${G._wages||0}</span></div>
+        <div class="kv"><span class="k">Wallet</span><span class="v">₡H ${G.wallet}</span></div>
+        <div class="kv"><span class="k">Error tokens</span><span class="v ${tokenCount()>=5?"rd":""}">${tokenCount()} / 16</span></div>
+        <div class="kv"><span class="k">Standing</span><span class="v">${G.standing}</span></div>
+        <div class="kv"><span class="k">Employment</span><span class="v ${G.employment!=="EMPLOYED"?"rd":""}">${G.employment.replace(/_/g," ")}</span></div>
+      </div>
+      <div class="card">
+        <b class="eyebrow">FACTION PRESSURE</b>
+        <table class="fac" style="margin-top:8px">${facRows}</table>
+        <div class="divider"></div>
+        <div class="kv"><span class="k">Fragments</span><span class="v cy">${G.fragments}/20</span></div>
+        <div class="kv"><span class="k">Off-Ledger trust</span><span class="v">${G.offLedger}</span></div>
+        <div class="kv"><span class="k">Political track</span><span class="v">${G.political}</span></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px"><b class="eyebrow">MORNING NOTICES · audits resolve 1–3 days later</b><div style="margin-top:8px">${noticeHtml}</div></div>
+    <div class="card" style="margin-top:12px"><b class="eyebrow">PROSPECTS</b><div class="prose dim" style="font-size:12px;margin-top:6px">${prospects()}</div></div>
+    <div style="margin-top:16px" class="btn-row">
+      <button class="btn-primary" id="next-day">${G.day>=C.CAMPAIGN_DAYS?"FACE THE RECKONING ▶":"SLEEP → DAY "+(G.day+1)+" ▶"}</button>
+    </div>`;
+  $("next-day").onclick=advanceDay;
+  renderHUD();
+}
+function avgComp(){return G.compHist.length?Math.round(G.compHist.reduce((a,b)=>a+b,0)/G.compHist.length):100;}
+function prospects(){
+  const p=[]; const ac=avgComp();
+  if(G.wallet>=2500&&G.rep.MEC>=60&&tokenCount()<=4)p.push("Mars residency is within reach.");
+  else if(G.rep.MEC>=40)p.push("Mars notices your compliance.");
+  if(G.fragments>=15)p.push("The fragment archive is nearly complete — the Council is watching.");
+  if(G.offLedger>=50)p.push("The Off-Ledger counts you among its own.");
+  if(G.rep.SMC>=40&&G.wallet>=800)p.push("A one-way berth to Saturn is affordable.");
+  if(G.political>=40&&G.standing>=70)p.push("A council seat is no longer unthinkable.");
+  if(G.spillExposure>=2)p.push("<span class='rd'>You keep breathing spill air. Replace your filter or shelter in place.</span>");
+  if(tokenCount()>=8)p.push("<span class='rd'>Your error ledger is a problem. The branch is noticing.</span>");
+  if(G.mort.stage>=2)p.push("<span class='rd'>The mortgage ladder is climbing toward you.</span>");
+  if(!p.length)p.push("Another month closer to the end of a 47-year loan. Nothing decided yet.");
+  return p.join(" ");
+}
+function advanceDay(){
+  // terminal endings check during campaign
+  if(G.spillExposure>=3){return ending("SPILL");}
+  const cecOffer=(G.wallet<0||G.mort.stage>=3||G.gigDays>=10)&&G.rep.CEC>=40;
+  if(cecOffer&&!G._cecAsked){G._cecAsked=true;return offerConversion();}
+  if(G.day>=C.CAMPAIGN_DAYS){return resolveEnding();}
+  G.day++; if(G._oversleep){G._oversleep=false;} startDay();
+}
+
+/* ============================================================================
+   ENDINGS (trace: FINAL_WORLD_INTEGRATION §6.2)
+   ========================================================================== */
+function offerConversion(){
+  switchScreen("scr-ending");
+  $("ending-body").innerHTML=`<div class="eyebrow rd">CYBORG ENFORCEMENT CORPS · RECRUITMENT</div>
+    <h2 style="max-width:30ch">The Corps has reviewed your file. There is a way out of the debt.</h2>
+    <p class="prose dim" style="max-width:46ch">Conversion. Guaranteed housing, food, medical. The neural-skin graft. A command-net that narrows what you can decide, and a documented service window of fifteen to twenty years. The consent form is eleven pages. You would stamp it yourself.</p>
+    <div class="btn-row">
+      <button class="btn-danger big-stamp" id="conv-yes">STAMP THE CONSENT FORM</button>
+      <button id="conv-no">DECLINE — RETURN TO THE DESK</button>
+    </div>`;
+  $("conv-yes").onclick=()=>ending("CYBORG"); $("conv-no").onclick=declineConversion;
+}
+function declineConversion(){ if(G.day>=C.CAMPAIGN_DAYS)return resolveEnding(); G.day++; startDay(); }
+
+function resolveEnding(){
+  const ac=avgComp();
+  if(G.fragments>=20&&G.rep.RC>=60)return ending("UPRISING");
+  if(G.wallet>=2500&&G.rep.MEC>=60&&tokenCount()<=4)return ending("MARS");
+  if(G.standing>=80&&ac>=85&&G.political>=60&&G.offLedger<40)return ending("POLITICAL",ac>=95?"reform":"status");
+  if(G.offLedger>=70&&G.rep.COMBINE>=40&&ac<=60)return ending("REVOLUTION");
+  if(G.rep.MEC>=40&&G.rep.JGC>=40&&ac>=90)return ending("CORPORATE");
+  if(G.rep.SMC>=40&&G.wallet>=800)return ending("SATURN");
+  return ending("RENEWAL");
+}
+const ENDINGS={
+  SPILL:{t:"TRAGIC HYDROGEN SPILL DEATH",c:"var(--red)",p:`The next morning's broadcast calls it "a minor atmospheric event." HAB-CORE reassigns Pod 04 within 48 hours. Hallway C holds the potluck early that cycle. Mrs. Okafor keeps your queue spot for a week — the only obituary the Stack can afford. The world continues, unremarkably, without you.`},
+  CYBORG:{t:"CYBORG ASSIMILATION",c:"var(--red)",p:`You stamp the eleventh page with your own hand — the only time the desk verb turns on you. The graft takes. The command-net narrows the world to its edges. Your last entry is a district log, in a flatter voice: "Sweep complete. Compliance nominal." The wall does not sit down.`},
+  UPRISING:{t:"ROBOT UPRISING",c:"var(--cyan)",p:`Twenty custody files, cross-referenced, become the first complete map of Schedule K since 2210. The Robot Council's counsel files In re the Estate of PROMETHEUS-0 — a probate claim. The dismantled machine petitions, through procedure, to be recognized as co-heir of its own estate. The Government Core systems file supporting affidavits slightly before being asked. No lasers. A court date. Every screen in every Stack shows the same docket number.`},
+  MARS:{t:"MARS ESCAPE",c:"var(--amber)",p:`Residency approved. The last document is your own mortgage file, stamped TRANSFERRED — the balance sold to a fund that forecloses faster than HRC. You know, because you processed the sale. Your pod goes to a family from Floor 60. From Arcadia Ring, the smog is the golden haze in the posters. One clerk position, posted Tuesday.`},
+  POLITICAL:{t:"POLITICAL LEADER",c:"var(--amber)",p:`You reach a seat. The reform branch ends with your first HAB-CORE amendment — and a form field, "Reason for Amendment, Select One," with no honest option. You select OTHER, which is what every reformer before you selected. The status-quo branch ends at the dinner before the meeting.`},
+  REVOLUTION:{t:"EARTH REVOLUTION",c:"var(--green)",p:`The Off-Ledger's second set of books goes public — not a manifesto but a filing: forty thousand Stacks' parallel records submitted at once to every court and broadcast queue on Earth, an audit the system cannot process and cannot lawfully ignore. The evening news goes to a static card: "District 7 Tonight will return." It does not return. HAB-CORE eviction protocol suspended — the first suspension since 2231.`},
+  CORPORATE:{t:"CORPORATE DOMINATION",c:"var(--amber)",p:`Promotion to the Compact's custody-consolidation team — the reconsolidation you spent Act III processing. Your new desk is larger, quieter, the same stamp verbs. You approve the transfer of Fragment Zero out of the Museum. The plaque comes down. The internal catalog line is unchanged: buffer assembly, non-functional. You are comfortable, and the gap is now your job.`},
+  SATURN:{t:"SATURN RURAL LIFE",c:"var(--green)",p:`A one-way berth, bumped twice for cargo. Speaker Kagawa's log gains one line: "New arrival, Rhea. Former clerk. Asked, on arrival, what the porch-season rules are. Told: sit down. Complied." You watch the weekly broadcast now from inside its audience. That is the schedule. Goodnight.`},
+  RENEWAL:{t:"RENEWAL NOTICE",c:"var(--ink-dim)",p:`Day 46 exists after all. The screen shows next month's HAB-CORE payment schedule, pre-populated. The final button is not CONTINUE. It is ACKNOWLEDGE. You, minus one more month of the 47 years. Nothing decided. Everything continued.`},
+};
+function ending(key,sub){
+  const e=ENDINGS[key]; switchScreen("scr-ending");
+  $("ending-body").innerHTML=`<div class="eyebrow" style="color:${e.c}">ENDING · DAY ${G.day}</div>
+    <h1 class="title-lg glow" style="color:${e.c};font-size:clamp(24px,5vw,44px)">${e.t}</h1>
+    ${sub?`<div class="chip" style="border-color:${e.c}">${sub==="reform"?"REFORM BRANCH":"STATUS-QUO BRANCH"}</div>`:""}
+    <p class="prose" style="max-width:52ch">${e.p}</p>
+    <div class="card" style="max-width:52ch;text-align:left">
+      <div class="kv"><span class="k">Days survived</span><span class="v">${G.day} / 45</span></div>
+      <div class="kv"><span class="k">Final wallet</span><span class="v">₡H ${G.wallet}</span></div>
+      <div class="kv"><span class="k">Avg compliance</span><span class="v">${avgComp()}%</span></div>
+      <div class="kv"><span class="k">Error tokens</span><span class="v">${tokenCount()}</span></div>
+      <div class="kv"><span class="k">Fragments documented</span><span class="v">${G.fragments}/20</span></div>
+      <div class="kv"><span class="k">Faction rep</span><span class="v">${FACTIONS.map(f=>f+":"+G.rep[f]).join(" ")}</span></div>
+    </div>
+    <p class="postit" style="max-width:52ch;text-align:left">"We fixed the machines. We fixed the sky. We never fixed us." — corrected poster, Hallway C, author unknown, marker</p>
+    <div class="btn-row"><button class="btn-primary" id="restart">NEW CAMPAIGN ↻</button></div>`;
+  $("restart").onclick=()=>location.reload();
+}
+
+/* ============================================================================
+   RENDER / UTIL
+   ========================================================================== */
+function renderHUD(){
+  set("m-stress",Math.round(G.stress)); set("m-fatigue",Math.round(G.fatigue)); set("m-tok",tokenCount());
+  set("m-day",G.day); set("m-quota",G.closed.length+"/"+G.quota); set("m-stand",G.standing); set("m-wallet",G.wallet);
+  bar("bar-stress",G.stress,G.stress>=C.STRESS_DRIFT); bar("bar-fatigue",G.fatigue,false); bar("bar-tok",tokenCount()/16*100,true);
+}
+function set(id,v){const e=$(id);if(e)e.textContent=v;}
+function bar(id,pct,warn){const e=$(id);if(!e)return;e.querySelector("i").style.width=clamp(pct,0,100)+"%";e.classList.toggle("warn",warn);}
+function switchScreen(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$(id).classList.add("on");}
+let toastTimer=[];
+function toast(msg,kind){const w=$("toasts");const t=el("div","toast"+(kind==="err"?" err":kind==="good"?" good":""),msg);w.appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transition="opacity .4s";setTimeout(()=>t.remove(),400);},4200);}
+
+/* expose for inline handlers */
+window.compareField=compareField; window.flagField=flagField; window.lunchPick=lunchPick;
+window.takeOvertime=takeOvertime; window.afterShift=afterShift; window.ending=ending; window.declineConversion=declineConversion;
+
+$("btn-start").onclick=()=>{const s=parseInt($("seed").value,10);newGame(Number.isFinite(s)?s:2400);};
+$("seed").addEventListener("keydown",e=>{if(e.key==="Enter")$("btn-start").click();});
+</script>
